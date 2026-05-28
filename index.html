@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="theme-color" content="#030912">
+  <title>Pomodoro Mana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #030912;
+      --dim:   #0D1F35;
+      --blue:  #44AAFF;
+      --cyan:  #00EEFF;
+      --green: #44FF88;
+      --faint: #0A1828;
+    }
+
+    html, body {
+      height: 100%;
+      overscroll-behavior: none;
+    }
+
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background: var(--bg);
+      color: var(--cyan);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* ── STARS ── */
+    #stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── SCANLINES ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
+      );
+      pointer-events: none;
+      z-index: 900;
+    }
+
+    /* ── CONTAINER ── */
+    .app {
+      position: relative;
+      z-index: 1;
+      width: min(400px, 100vw);
+      padding: 12px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* ── TITLE ── */
+    .title {
+      font-size: 9px;
+      color: var(--blue);
+      text-shadow: 0 0 8px var(--blue), 0 0 20px #0055FF;
+      letter-spacing: 3px;
+      text-align: center;
+    }
+
+    /* ── FLAME CONTAINER ── */
+    .flame-wrap {
+      position: relative;
+      padding: 6px;
+      background: rgba(0,8,25,0.7);
+      border: 3px solid var(--dim);
+      /* clipped corners = pixel art style */
+      clip-path: polygon(
+        10px 0%, calc(100% - 10px) 0%,
+        100% 10px, 100% calc(100% - 10px),
+        calc(100% - 10px) 100%, 10px 100%,
+        0% calc(100% - 10px), 0% 10px
+      );
+    }
+
+    #flameCanvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* ── TIMER ── */
+    .timer {
+      font-size: 38px;
+      letter-spacing: 4px;
+      color: var(--cyan);
+      text-shadow: 0 0 12px var(--cyan), 0 0 24px #0088FF;
+      transition: color .4s, text-shadow .4s;
+      line-height: 1;
+    }
+    .timer.warn   { color: #FFCC00; text-shadow: 0 0 12px #FFCC00, 0 0 24px #FF8800; }
+    .timer.urgent { color: #FF4466; text-shadow: 0 0 12px #FF4466, 0 0 24px #CC0033; }
+
+    /* ── PROGRESS BAR ── */
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: var(--dim);
+      border: 2px solid #122;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      position: absolute;
+      inset: 0;
+      right: auto;
+      background: var(--blue);
+      box-shadow: 0 0 8px var(--blue);
+      transition: width 1s linear, background .5s, box-shadow .5s;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #1A3A6A 30%, #1A3A6A 70%, transparent);
+    }
+
+    /* ── MANA SECTION ── */
+    .mana-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .mana-label {
+      font-size: 7px;
+      color: #336699;
+      letter-spacing: 2px;
+    }
+
+    .mana-num {
+      font-size: 30px;
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
+      transition: color .5s, text-shadow .5s;
+      min-width: 3ch;
+      text-align: center;
+    }
+    .mana-num.t1 { color: #00FFCC; text-shadow: 0 0 10px #00FFCC, 0 0 20px #00AA88; }
+    .mana-num.t2 { color: #FFD700; text-shadow: 0 0 10px #FFD700, 0 0 22px #FF8800; }
+    .mana-num.t3 { color: #FF6644; text-shadow: 0 0 10px #FF6644, 0 0 22px #CC2200; }
+    .mana-num.t4 { color: #FF88CC; text-shadow: 0 0 10px #FF88CC, 0 0 22px #CC0099; }
+    .mana-num.t5 { color: #EEEEFF; text-shadow: 0 0 10px #FFFFFF, 0 0 22px #AAAAFF; }
+
+    /* ── PIPS ── */
+    .pips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+      max-width: 230px;
+    }
+    .pip {
+      width: 10px;
+      height: 10px;
+      background: #0A1828;
+      border: 1px solid #1A3050;
+    }
+    .pip.on {
+      background: var(--pc, #0066FF);
+      box-shadow: 0 0 5px var(--pc, #0066FF);
+      border-color: transparent;
+    }
+    .pip-extra {
+      font-size: 6px;
+      color: #446688;
+      align-self: center;
+    }
+
+    /* ── STREAK ── */
+    .streak {
+      font-size: 8px;
+      color: var(--green);
+      text-shadow: 0 0 6px var(--green);
+    }
+
+    /* ── BUTTONS ── */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+    .btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      flex: 1;
+      padding: 12px 6px;
+      background: transparent;
+      border: 2px solid;
+      cursor: pointer;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: transform .05s, opacity .1s;
+    }
+    .btn:active { transform: translateY(2px); opacity: .8; }
+    .btn-go   { color: var(--green); border-color: var(--green); box-shadow: 0 0 8px rgba(68,255,136,.25), inset 0 0 8px rgba(68,255,136,.04); }
+    .btn-stop { color: #FF4466; border-color: #FF4466; box-shadow: 0 0 8px rgba(255,68,102,.25), inset 0 0 8px rgba(255,68,102,.04); }
+
+    /* ── INTERVAL ── */
+    .interval-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .interval-label { font-size: 6px; color: #336699; letter-spacing: 1px; }
+    .interval-row   { display: flex; align-items: center; gap: 14px; }
+    .ibt {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      color: #4488FF;
+      background: transparent;
+      border: 2px solid #1A3060;
+      width: 34px; height: 34px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .ibt:active { background: rgba(68,136,255,.2); }
+    .ival { font-size: 18px; color: #00CCFF; min-width: 3ch; text-align: center; }
+
+    /* ── COMPLETION FLASH ── */
+    .flash-layer {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 500;
+      pointer-events: none;
+    }
+    .flash-msg {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      line-height: 2.2;
+      padding: 20px 28px;
+      background: rgba(2,8,22,.96);
+      border: 2px solid;
+      text-align: center;
+      animation: popIn .14s ease-out, fadeUp 2.4s .4s forwards;
+    }
+    @keyframes popIn {
+      from { transform: scale(.65); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    @keyframes fadeUp {
+      from { transform: translateY(0); opacity: 1; }
+      to   { transform: translateY(-60px); opacity: 0; }
+    }
+
+    /* ── MANA TICKER (streak bonus indicator) ── */
+    .bonus-badge {
+      font-size: 6px;
+      color: #FFCC44;
+      text-shadow: 0 0 6px #FFCC44;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="app">
+  <div class="title">✦ POMODORO MANA ✦</div>
+
+  <div class="flame-wrap">
+    <canvas id="flameCanvas" width="180" height="220"></canvas>
+  </div>
+
+  <div class="timer" id="timer">25:00</div>
+
+  <div class="progress-track" style="width:100%">
+    <div class="progress-fill" id="progressFill" style="width:100%"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="mana-section">
+    <div class="mana-label">— MANA —</div>
+    <div class="mana-num" id="manaNum">0</div>
+    <div class="pips"    id="pips"></div>
+    <div class="streak"  id="streak">RACHA: 0</div>
+    <div class="bonus-badge" id="bonusBadge" style="opacity:0">BONUS ACTIVO</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-go"   id="startBtn" onclick="toggleTimer()">INICIAR</button>
+    <button class="btn btn-stop"              onclick="resetAll()">RESET</button>
+  </div>
+
+  <div class="interval-wrap">
+    <div class="interval-label">INTERVALO (MIN)</div>
+    <div class="interval-row">
+      <button class="ibt" onclick="adjInterval(-5)">-</button>
+      <div class="ival" id="ival">25</div>
+      <button class="ibt" onclick="adjInterval(+5)">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="flash-layer" id="flashLayer"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  FLAME TIERS  (one per multiple-of-5 mana)
+// ═══════════════════════════════════════════════════════════
+const TIERS = [
+  // 0–4   : Blue (mystical)
+  { hot:[120,230,255],  mid:[40,130,255],  cool:[10,55,200]  },
+  // 5–9   : Teal / Cyan
+  { hot:[50,255,220],   mid:[0,200,170],   cool:[0,80,120]   },
+  // 10–14 : Gold ★
+  { hot:[255,230,60],   mid:[255,155,10],  cool:[210,65,0]   },
+  // 15–19 : Crimson
+  { hot:[255,100,70],   mid:[230,30,20],   cool:[140,0,0]    },
+  // 20–24 : Pink / Arcane
+  { hot:[255,120,240],  mid:[210,50,200],  cool:[120,0,120]  },
+  // 25+   : White / Transcendent
+  { hot:[245,245,255],  mid:[180,180,255], cool:[90,90,210]  },
+];
+
+// Pip colors per tier
+const PIP_COLORS = ['#0088FF','#00CCAA','#FFD700','#FF5544','#FF66CC','#CCCCFF'];
+
+// Mana-number CSS classes per tier
+const TIER_CLASSES = ['','t1','t2','t3','t4','t5'];
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+const S = {
+  mana:      0,
+  streak:    0,
+  interval:  25,
+  remaining: 25 * 60,
+  total:     25 * 60,
+  running:   false,
+  flameBoost: 0,
+};
+let timerId   = null;
+let hiddenAt  = null;
+
+function tier() {
+  return Math.min(Math.floor(S.mana / 5), TIERS.length - 1);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PIXEL-ART FLAME SIMULATION
+// ═══════════════════════════════════════════════════════════
+const FC  = document.getElementById('flameCanvas');
+const FCX = FC.getContext('2d');
+
+// Internal pixel grid — each cell = 10×10px on canvas for chunky pixel-art look
+const GW = 18, GH = 22;
+const heat = new Float32Array(GW * GH);
+
+function stepFlame() {
+  const boost = S.flameBoost;
+
+  // Seed heat at bottom THREE rows for a fuller flame base
+  for (let x = 0; x < GW; x++) {
+    heat[(GH - 1) * GW + x] = 240 + Math.random() * 15 + boost * 20;
+    heat[(GH - 2) * GW + x] = Math.random() > 0.3 ? 220 + Math.random() * 20 + boost * 15 : 180;
+    heat[(GH - 3) * GW + x] = Math.random() > 0.5 ? 190 + Math.random() * 25 + boost * 10 : 130;
+  }
+
+  // Propagate flame upward — less cooling so flame rises higher
+  for (let y = 0; y < GH - 3; y++) {
+    for (let x = 0; x < GW; x++) {
+      const l  = heat[y * GW + Math.max(x - 1, 0)];
+      const r  = heat[y * GW + Math.min(x + 1, GW - 1)];
+      const b  = heat[(y + 1) * GW + x];
+      const b2 = heat[(y + 2) * GW + x];
+      const avg  = (l + r + b + b2) / 4;
+      const cool = ((GH - y) / GH) * 1.5 + Math.random() * 1.2;
+      heat[y * GW + x] = Math.max(0, avg - cool);
+    }
+  }
+
+  if (S.flameBoost > 0) S.flameBoost = Math.max(0, S.flameBoost - 0.04);
+}
+
+function renderFlame() {
+  const W  = FC.width,  H = FC.height;
+  const pw = W / GW,   ph = H / GH;
+  const t  = TIERS[tier()];
+
+  // Dark background for contrast
+  FCX.fillStyle = 'rgba(1,4,14,0.85)';
+  FCX.fillRect(0, 0, W, H);
+
+  for (let y = 0; y < GH; y++) {
+    for (let x = 0; x < GW; x++) {
+      const h = heat[y * GW + x];
+      if (h < 6) continue;
+
+      let r, g, b, a;
+      if (h >= 130) {
+        const k = Math.min(1, (h - 130) / 125);
+        r = t.mid[0] + (t.hot[0] - t.mid[0]) * k;
+        g = t.mid[1] + (t.hot[1] - t.mid[1]) * k;
+        b = t.mid[2] + (t.hot[2] - t.mid[2]) * k;
+        a = 0.75 + k * 0.25;
+      } else if (h >= 50) {
+        const k = (h - 50) / 80;
+        r = t.cool[0] + (t.mid[0] - t.cool[0]) * k;
+        g = t.cool[1] + (t.mid[1] - t.cool[1]) * k;
+        b = t.cool[2] + (t.mid[2] - t.cool[2]) * k;
+        a = 0.35 + k * 0.45;
+      } else {
+        r = t.cool[0]; g = t.cool[1]; b = t.cool[2];
+        a = (h / 50) * 0.38;
+      }
+
+      FCX.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${a.toFixed(2)})`;
+      FCX.fillRect(x * pw | 0, y * ph | 0, (pw + 1) | 0, (ph + 1) | 0);
+    }
+  }
+
+  // Strong ambient glow at flame base
+  const [hr, hg, hb] = t.hot;
+  const grd = FCX.createRadialGradient(W / 2, H * 0.85, 4, W / 2, H * 0.85, W * 0.65);
+  grd.addColorStop(0, `rgba(${hr},${hg},${hb},0.45)`);
+  grd.addColorStop(0.4, `rgba(${hr},${hg},${hb},0.12)`);
+  grd.addColorStop(1, 'rgba(0,0,0,0)');
+  FCX.fillStyle = grd;
+  FCX.fillRect(0, 0, W, H);
+}
+
+function flameLoop() {
+  stepFlame();
+  renderFlame();
+  requestAnimationFrame(flameLoop);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STARFIELD BACKGROUND
+// ═══════════════════════════════════════════════════════════
+const SC  = document.getElementById('stars');
+const SCX = SC.getContext('2d');
+let stars = [];
+
+function initStars() {
+  SC.width  = window.innerWidth;
+  SC.height = window.innerHeight;
+  stars = Array.from({ length: 90 }, () => ({
+    x:  Math.random() * SC.width,
+    y:  Math.random() * SC.height,
+    sz: Math.random() > 0.82 ? 2 : 1,
+    ph: Math.random() * Math.PI * 2,
+    sp: 0.25 + Math.random() * 0.7,
+  }));
+}
+
+function starsLoop() {
+  SCX.clearRect(0, 0, SC.width, SC.height);
+  const t = Date.now() / 1000;
+  stars.forEach(s => {
+    const a = 0.12 + 0.55 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
+    SCX.fillStyle = `rgba(90,170,255,${a.toFixed(2)})`;
+    SCX.fillRect(s.x, s.y, s.sz, s.sz);
+  });
+  requestAnimationFrame(starsLoop);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════════════════
+function fmt(s) {
+  return `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
+}
+
+function refreshTimer() {
+  const el  = document.getElementById('timer');
+  const pct = S.remaining / S.total;
+  el.textContent = fmt(S.remaining);
+  el.className   = 'timer' + (pct < 0.15 ? ' urgent' : pct < 0.33 ? ' warn' : '');
+}
+
+function refreshProgress() {
+  const pct  = S.total > 0 ? S.remaining / S.total : 1;
+  const fill = document.getElementById('progressFill');
+  fill.style.width = (pct * 100) + '%';
+  const p = pct * 100;
+  const [col, shadow] = p > 55 ? ['#0088FF','#0088FF']
+                      : p > 25 ? ['#4455FF','#4455FF']
+                      :          ['#FF4466','#FF4466'];
+  fill.style.background = col;
+  fill.style.boxShadow  = `0 0 8px ${shadow}`;
+}
+
+function toggleTimer() {
+  S.running ? pauseTimer() : startTimer();
+}
+
+function startTimer() {
+  if (S.remaining <= 0) return;
+  S.running = true;
+  document.getElementById('startBtn').textContent = 'PAUSAR';
+  timerId = setInterval(tick, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(timerId);
+  S.running = false;
+  document.getElementById('startBtn').textContent = 'REANUDAR';
+}
+
+function tick() {
+  if (S.remaining <= 0) return;
+  S.remaining--;
+  refreshTimer();
+  refreshProgress();
+  if (S.remaining <= 0) completePomodoro();
+}
+
+function completePomodoro() {
+  clearInterval(timerId);
+  S.running = false;
+  S.streak++;
+
+  // 1 base mana + 1 bonus per 5 consecutive
+  const bonus  = Math.floor(S.streak / 5);
+  const earned = 1 + bonus;
+  S.mana += earned;
+
+  S.flameBoost = 4;  // flame burst animation
+  refreshMana();
+  showFlash(earned, bonus);
+
+  S.remaining = S.interval * 60;
+  S.total     = S.remaining;
+  refreshTimer();
+  refreshProgress();
+  document.getElementById('startBtn').textContent = 'INICIAR';
+}
+
+function resetAll() {
+  clearInterval(timerId);
+  S.running   = false;
+  S.mana      = 0;
+  S.streak    = 0;
+  S.remaining = S.interval * 60;
+  S.total     = S.remaining;
+  refreshTimer();
+  refreshProgress();
+  refreshMana();
+  document.getElementById('startBtn').textContent = 'INICIAR';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MANA DISPLAY
+// ═══════════════════════════════════════════════════════════
+function refreshMana() {
+  const t   = tier();
+  const num = document.getElementById('manaNum');
+  num.textContent = S.mana;
+  num.className   = 'mana-num ' + (TIER_CLASSES[t] || '');
+
+  document.getElementById('streak').textContent = `RACHA: ${S.streak}`;
+
+  const badge = document.getElementById('bonusBadge');
+  badge.style.opacity = S.streak >= 5 ? '1' : '0';
+  if (S.streak >= 5) badge.textContent = `BONUS x${Math.floor(S.streak / 5) + 1}`;
+
+  // Pip grid — show up to 25 pips
+  const pipsEl = document.getElementById('pips');
+  pipsEl.innerHTML = '';
+  const show = Math.min(S.mana, 25);
+  for (let i = 0; i < show; i++) {
+    const pipTier = Math.min(Math.floor(i / 5), PIP_COLORS.length - 1);
+    const div     = document.createElement('div');
+    div.className = 'pip on';
+    div.style.setProperty('--pc', PIP_COLORS[pipTier]);
+    pipsEl.appendChild(div);
+  }
+  if (S.mana > 25) {
+    const ex = document.createElement('div');
+    ex.className   = 'pip-extra';
+    ex.textContent = `+${S.mana - 25}`;
+    pipsEl.appendChild(ex);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COMPLETION FLASH
+// ═══════════════════════════════════════════════════════════
+function showFlash(earned, bonus) {
+  const t      = tier();
+  const colors = ['#00EEFF','#00FFCC','#FFD700','#FF6644','#FF88CC','#EEEEFF'];
+  const col    = colors[t] || '#00EEFF';
+  const layer  = document.getElementById('flashLayer');
+
+  const bonusLine = bonus > 0
+    ? `<div style="font-size:7px;color:#FFCC44;text-shadow:0 0 8px #FFAA00;margin-top:4px">BONUS RACHA +${bonus}</div>`
+    : '';
+
+  layer.innerHTML = `
+    <div class="flash-msg" style="border-color:${col};color:${col};text-shadow:0 0 16px ${col}">
+      +${earned} MANA
+      <div style="font-size:8px;color:#44FF88;text-shadow:0 0 8px #44FF88">✦ COMPLETO ✦</div>
+      ${bonusLine}
+    </div>`;
+  layer.style.display = 'flex';
+  setTimeout(() => { layer.style.display = 'none'; layer.innerHTML = ''; }, 2800);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INTERVAL CONTROL
+// ═══════════════════════════════════════════════════════════
+function adjInterval(d) {
+  if (S.running) return;
+  S.interval  = Math.max(1, Math.min(90, S.interval + d));
+  S.remaining = S.interval * 60;
+  S.total     = S.remaining;
+  document.getElementById('ival').textContent = S.interval;
+  refreshTimer();
+  refreshProgress();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BACKGROUND / VISIBILITY  (catch up lost time on return)
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    hiddenAt = Date.now();
+  } else if (hiddenAt && S.running) {
+    const lost = Math.floor((Date.now() - hiddenAt) / 1000);
+    S.remaining = Math.max(0, S.remaining - lost);
+    refreshTimer();
+    refreshProgress();
+    if (S.remaining === 0) completePomodoro();
+    hiddenAt = null;
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  initStars();
+  starsLoop();
+  // Pre-warm flame so it's already fully developed on first render
+  for (let i = 0; i < 150; i++) stepFlame();
+  flameLoop();
+  refreshTimer();
+  refreshProgress();
+  refreshMana();
+});
+
+window.addEventListener('resize', () => {
+  SC.width  = window.innerWidth;
+  SC.height = window.innerHeight;
+  initStars();
+});
+</script>
+</body>
+</html>
