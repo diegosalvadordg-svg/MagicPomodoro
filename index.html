@@ -4,139 +4,178 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="theme-color" content="#030912">
-  <title>Pomodoro Mana</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#06091A">
+  <title>Mana Collector</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg:    #030912;
-      --dim:   #0D1F35;
-      --blue:  #44AAFF;
-      --cyan:  #00EEFF;
-      --green: #44FF88;
-      --faint: #0A1828;
-    }
-
-    html, body {
-      height: 100%;
-      overscroll-behavior: none;
-    }
+    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 
     body {
       font-family: 'Press Start 2P', monospace;
-      background: var(--bg);
-      color: var(--cyan);
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: #06091A;
+      color: #44FFCC;
+      user-select: none;
     }
 
-    /* ── STARS ── */
+    /* ══════════════════════════════════════════
+       SCENE — fixed backdrop
+    ══════════════════════════════════════════ */
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      /* Night sky gradient */
+      background: linear-gradient(180deg,
+        #05071A 0%,
+        #090E30 18%,
+        #0D1545 38%,
+        #0B1238 62%,
+        #09100E 85%,
+        #060C08 100%
+      );
+    }
+
+    /* Stars canvas */
     #stars {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 0;
+      z-index: 1;
     }
 
-    /* ── SCANLINES ── */
+    /* ── MOON ── */
+    .moon-wrap {
+      position: fixed;
+      top: 4%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      animation: moonBreath 16s ease-in-out infinite;
+    }
+    @keyframes moonBreath {
+      0%,100% { opacity: 0.68; filter: drop-shadow(0 0 8px rgba(232,248,255,0.22)); }
+      50%     { opacity: 1.00; filter: drop-shadow(0 0 22px rgba(232,248,255,0.60)); }
+    }
+    .moon-wrap.moon-burst {
+      animation: moonFlare 1.4s ease-out forwards, moonBreath 16s ease-in-out 1.4s infinite;
+    }
+    @keyframes moonFlare {
+      0%  { opacity: 0.8; filter: drop-shadow(0 0 12px rgba(232,248,255,0.38)); }
+      25% { opacity: 1.0; filter: drop-shadow(0 0 44px rgba(255,255,255,0.92)); }
+      100%{ opacity: 0.9; filter: drop-shadow(0 0 18px rgba(232,248,255,0.45)); }
+    }
+
+    /* ── CLOUDS (blurred CSS shapes) ── */
+    .cloud { position: fixed; pointer-events: none; z-index: 3; border-radius: 50%; }
+    .cl1 { width:240px; height:160px; top:22%; left:-70px;
+           background: radial-gradient(ellipse 68% 58% at 62% 50%, #231650 0%, #170E3A 45%, transparent 100%);
+           filter: blur(18px); }
+    .cl2 { width:210px; height:140px; top:16%; right:-60px;
+           background: radial-gradient(ellipse 68% 58% at 38% 50%, #1D1248 0%, #130C30 45%, transparent 100%);
+           filter: blur(18px); }
+    .cl3 { width:170px; height:100px; top:36%; left:-30px;
+           background: radial-gradient(ellipse 70% 60% at 65% 50%, #1A1040 0%, transparent 100%);
+           filter: blur(22px); }
+    .cl4 { width:180px; height:110px; top:30%; right:-25px;
+           background: radial-gradient(ellipse 70% 60% at 35% 50%, #180E38 0%, transparent 100%);
+           filter: blur(22px); }
+
+    /* Subtle scanlines */
     body::after {
       content: '';
       position: fixed;
       inset: 0;
       background: repeating-linear-gradient(
-        0deg,
-        transparent 0px, transparent 3px,
-        rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
+        0deg, transparent 0px, transparent 3px,
+        rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
       );
       pointer-events: none;
-      z-index: 900;
+      z-index: 800;
     }
 
-    /* ── CONTAINER ── */
-    .app {
+    /* ══════════════════════════════════════════
+       UI  — overlay on scene
+    ══════════════════════════════════════════ */
+    .ui {
       position: relative;
-      z-index: 1;
-      width: min(400px, 100vw);
-      padding: 12px 16px 16px;
+      z-index: 10;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      padding: 0 22px;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      gap: 0;
     }
 
     /* ── TITLE ── */
     .title {
       font-size: 9px;
-      color: var(--blue);
-      text-shadow: 0 0 8px var(--blue), 0 0 20px #0055FF;
+      color: #8899BB;
       letter-spacing: 3px;
       text-align: center;
+      text-shadow: 0 0 10px rgba(100,150,220,0.35);
     }
 
-    /* ── FLAME CONTAINER ── */
-    .flame-wrap {
-      position: relative;
-      padding: 6px;
-      background: rgba(0,8,25,0.7);
-      border: 3px solid var(--dim);
-      /* clipped corners = pixel art style */
-      clip-path: polygon(
-        10px 0%, calc(100% - 10px) 0%,
-        100% 10px, 100% calc(100% - 10px),
-        calc(100% - 10px) 100%, 10px 100%,
-        0% calc(100% - 10px), 0% 10px
-      );
-    }
-
-    #flameCanvas {
-      display: block;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-    }
-
-    /* ── TIMER ── */
+    /* ── TIMER — 5-stage color progression (white → red) ── */
     .timer {
-      font-size: 38px;
-      letter-spacing: 4px;
-      color: var(--cyan);
-      text-shadow: 0 0 12px var(--cyan), 0 0 24px #0088FF;
-      transition: color .4s, text-shadow .4s;
+      font-size: 54px;
+      letter-spacing: 5px;
+      /* Stage 0: > 65% — almost white */
+      color: #E8F8FF;
+      text-shadow: 0 0 14px rgba(200,240,255,0.55), 0 0 30px rgba(160,220,255,0.20);
       line-height: 1;
+      text-align: center;
+      transition: color .8s, text-shadow .8s;
     }
-    .timer.warn   { color: #FFCC00; text-shadow: 0 0 12px #FFCC00, 0 0 24px #FF8800; }
-    .timer.urgent { color: #FF4466; text-shadow: 0 0 12px #FF4466, 0 0 24px #CC0033; }
+    .timer.tc1 {
+      /* Stage 1: 40-65% — cyan */
+      color: #44FFEE;
+      text-shadow: 0 0 14px rgba(68,255,238,0.65), 0 0 30px rgba(0,200,180,0.25);
+    }
+    .timer.tc2 {
+      /* Stage 2: 22-40% — gold */
+      color: #FFCC44;
+      text-shadow: 0 0 14px rgba(255,200,60,0.72), 0 0 30px rgba(255,160,0,0.28);
+    }
+    .timer.tc3 {
+      /* Stage 3: 8-22% — orange */
+      color: #FF8C22;
+      text-shadow: 0 0 14px rgba(255,140,34,0.78), 0 0 30px rgba(255,100,0,0.32);
+    }
+    .timer.tc4 {
+      /* Stage 4: < 8% — red */
+      color: #FF3355;
+      text-shadow: 0 0 16px rgba(255,50,85,0.85), 0 0 32px rgba(220,0,30,0.40);
+    }
 
     /* ── PROGRESS BAR ── */
     .progress-track {
       width: 100%;
-      height: 10px;
-      background: var(--dim);
-      border: 2px solid #122;
+      max-width: 350px;
+      height: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
       overflow: hidden;
-      position: relative;
     }
     .progress-fill {
-      position: absolute;
-      inset: 0;
-      right: auto;
-      background: var(--blue);
-      box-shadow: 0 0 8px var(--blue);
+      height: 100%;
+      background: #FF8899;
+      box-shadow: 0 0 7px #FF8899;
       transition: width 1s linear, background .5s, box-shadow .5s;
     }
 
     /* ── DIVIDER ── */
     .divider {
       width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #1A3A6A 30%, #1A3A6A 70%, transparent);
+      max-width: 350px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(80,120,180,0.25) 30%,
+                                         rgba(80,120,180,0.25) 70%, transparent);
     }
 
     /* ── MANA SECTION ── */
@@ -144,124 +183,152 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       width: 100%;
     }
-
     .mana-label {
       font-size: 7px;
-      color: #336699;
-      letter-spacing: 2px;
+      color: #557799;
+      letter-spacing: 3px;
     }
 
+    /* Gem + number stacked container */
+    .mana-gem-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100px;
+      height: 118px;
+    }
+
+    /* Gem icon — behind the number */
+    .gem-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+    }
+
+    /* Mana number — on top of the gem */
     .mana-num {
-      font-size: 30px;
-      color: var(--cyan);
-      text-shadow: 0 0 10px var(--cyan);
+      position: relative;
+      z-index: 1;
+      font-size: 32px;
+      color: #44FFCC;
+      text-shadow: 0 0 10px rgba(68,255,204,0.70);
+      text-align: center;
       transition: color .5s, text-shadow .5s;
       min-width: 3ch;
-      text-align: center;
     }
-    .mana-num.t1 { color: #00FFCC; text-shadow: 0 0 10px #00FFCC, 0 0 20px #00AA88; }
-    .mana-num.t2 { color: #FFD700; text-shadow: 0 0 10px #FFD700, 0 0 22px #FF8800; }
-    .mana-num.t3 { color: #FF6644; text-shadow: 0 0 10px #FF6644, 0 0 22px #CC2200; }
-    .mana-num.t4 { color: #FF88CC; text-shadow: 0 0 10px #FF88CC, 0 0 22px #CC0099; }
-    .mana-num.t5 { color: #EEEEFF; text-shadow: 0 0 10px #FFFFFF, 0 0 22px #AAAAFF; }
+    .mana-num.t1 { color: #44FFEE; text-shadow: 0 0 10px rgba(68,255,238,.70); }
+    .mana-num.t2 { color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,.75),  0 0 22px rgba(255,170,0,.30); }
+    .mana-num.t3 { color: #FF7766; text-shadow: 0 0 10px rgba(255,100,80,.70); }
+    .mana-num.t4 { color: #FF88CC; text-shadow: 0 0 10px rgba(255,136,204,.70); }
+    .mana-num.t5 { color: #EEEEFF; text-shadow: 0 0 12px rgba(220,220,255,.90); }
 
-    /* ── PIPS ── */
+    /* Pips */
     .pips {
       display: flex;
       flex-wrap: wrap;
       gap: 5px;
       justify-content: center;
-      max-width: 230px;
+      max-width: 250px;
     }
     .pip {
-      width: 10px;
-      height: 10px;
-      background: #0A1828;
-      border: 1px solid #1A3050;
+      width: 10px; height: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
     }
     .pip.on {
-      background: var(--pc, #0066FF);
-      box-shadow: 0 0 5px var(--pc, #0066FF);
+      background: var(--pc, #44FFCC);
+      box-shadow: 0 0 5px var(--pc, #44FFCC);
       border-color: transparent;
     }
-    .pip-extra {
-      font-size: 6px;
-      color: #446688;
-      align-self: center;
-    }
+    .pip-extra { font-size: 6px; color: #446688; align-self: center; }
 
-    /* ── STREAK ── */
     .streak {
       font-size: 8px;
-      color: var(--green);
-      text-shadow: 0 0 6px var(--green);
+      color: #44FF88;
+      text-shadow: 0 0 6px rgba(68,255,136,0.50);
+    }
+    .bonus-badge {
+      font-size: 6px;
+      color: #FFCC44;
+      text-shadow: 0 0 6px #FFAA00;
+      letter-spacing: 1px;
     }
 
     /* ── BUTTONS ── */
     .btn-row {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       width: 100%;
+      max-width: 350px;
     }
     .btn {
       font-family: 'Press Start 2P', monospace;
       font-size: 9px;
       flex: 1;
-      padding: 12px 6px;
+      padding: 13px 6px;
       background: transparent;
       border: 2px solid;
       cursor: pointer;
       text-align: center;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
       transition: transform .05s, opacity .1s;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     .btn:active { transform: translateY(2px); opacity: .8; }
-    .btn-go   { color: var(--green); border-color: var(--green); box-shadow: 0 0 8px rgba(68,255,136,.25), inset 0 0 8px rgba(68,255,136,.04); }
-    .btn-stop { color: #FF4466; border-color: #FF4466; box-shadow: 0 0 8px rgba(255,68,102,.25), inset 0 0 8px rgba(255,68,102,.04); }
+    .btn-go   { color: #44FFCC; border-color: #44FFCC;
+                box-shadow: 0 0 10px rgba(68,255,204,.18), inset 0 0 10px rgba(68,255,204,.04); }
+    .btn-stop { color: #FF5566; border-color: #FF5566;
+                box-shadow: 0 0 10px rgba(255,85,102,.18), inset 0 0 10px rgba(255,85,102,.04); }
 
     /* ── INTERVAL ── */
     .interval-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
-    .interval-label { font-size: 6px; color: #336699; letter-spacing: 1px; }
-    .interval-row   { display: flex; align-items: center; gap: 14px; }
+    .interval-label { font-size: 6px; color: #557799; letter-spacing: 2px; }
+    .interval-row   { display: flex; align-items: center; gap: 18px; }
     .ibt {
       font-family: 'Press Start 2P', monospace;
-      font-size: 14px;
-      color: #4488FF;
-      background: transparent;
-      border: 2px solid #1A3060;
-      width: 34px; height: 34px;
+      font-size: 15px;
+      color: #44AACC;
+      background: rgba(68,170,204,0.07);
+      border: 2px solid rgba(68,170,204,0.28);
+      width: 36px; height: 36px;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
+      border-radius: 3px;
       -webkit-tap-highlight-color: transparent;
     }
-    .ibt:active { background: rgba(68,136,255,.2); }
-    .ival { font-size: 18px; color: #00CCFF; min-width: 3ch; text-align: center; }
+    .ibt:active { background: rgba(68,170,204,0.18); transform: translateY(1px); }
+    .ival { font-size: 20px; color: #66CCEE; min-width: 3ch; text-align: center; }
 
     /* ── COMPLETION FLASH ── */
     .flash-layer {
       position: fixed; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      z-index: 500;
-      pointer-events: none;
+      z-index: 500; pointer-events: none;
     }
     .flash-msg {
       font-family: 'Press Start 2P', monospace;
-      font-size: 14px;
+      font-size: 15px;
       line-height: 2.2;
-      padding: 20px 28px;
-      background: rgba(2,8,22,.96);
+      padding: 22px 30px;
+      background: rgba(4,7,22,0.96);
       border: 2px solid;
       text-align: center;
-      animation: popIn .14s ease-out, fadeUp 2.4s .4s forwards;
+      animation: popIn .14s ease-out, fadeUp 2.4s .5s forwards;
     }
     @keyframes popIn {
       from { transform: scale(.65); opacity: 0; }
@@ -269,251 +336,324 @@
     }
     @keyframes fadeUp {
       from { transform: translateY(0); opacity: 1; }
-      to   { transform: translateY(-60px); opacity: 0; }
+      to   { transform: translateY(-70px); opacity: 0; }
     }
 
-    /* ── MANA TICKER (streak bonus indicator) ── */
-    .bonus-badge {
-      font-size: 6px;
-      color: #FFCC44;
-      text-shadow: 0 0 6px #FFCC44;
-      letter-spacing: 1px;
-    }
+    /* Spacing utility */
+    .g6  { height: 6px; }
+    .g8  { height: 8px; }
+    .g12 { height: 12px; }
+    .g16 { height: 16px; }
+    .g20 { height: 20px; }
+    .g24 { height: 24px; }
   </style>
 </head>
 <body>
 
-<canvas id="stars"></canvas>
+<!-- ══════════════  SCENE  ══════════════ -->
+<div class="scene">
+  <canvas id="stars"></canvas>
 
-<div class="app">
-  <div class="title">✦ POMODORO MANA ✦</div>
-
-  <div class="flame-wrap">
-    <canvas id="flameCanvas" width="180" height="220"></canvas>
+  <!-- Crescent moon (SVG mask) -->
+  <div class="moon-wrap" id="moonWrap">
+    <svg width="116" height="116" viewBox="0 0 116 116">
+      <defs>
+        <mask id="cres">
+          <rect width="116" height="116" fill="black"/>
+          <circle cx="62" cy="56" r="46" fill="white"/>
+          <circle cx="38" cy="47" r="40" fill="black"/>
+        </mask>
+      </defs>
+      <!-- Body -->
+      <circle cx="62" cy="56" r="46" fill="#E8F8FF" mask="url(#cres)"/>
+      <!-- Highlight -->
+      <circle cx="76" cy="40" r="16" fill="#FFFFFF" opacity="0.50" mask="url(#cres)"/>
+      <!-- Shadow (subtle cool tone) -->
+      <ellipse cx="60" cy="72" rx="24" ry="18" fill="#90B8CC" opacity="0.22" mask="url(#cres)"/>
+      <!-- Pixel texture (crater-like marks) -->
+      <g mask="url(#cres)" fill="#7AAABB" opacity="0.18">
+        <rect x="57" y="32" width="4" height="4"/>
+        <rect x="74" y="52" width="3" height="3"/>
+        <rect x="64" y="64" width="4" height="4"/>
+        <rect x="48" y="48" width="3" height="3"/>
+        <rect x="82" y="40" width="2" height="2"/>
+        <rect x="52" y="70" width="2" height="2"/>
+      </g>
+    </svg>
   </div>
 
+  <!-- Clouds -->
+  <div class="cloud cl1"></div>
+  <div class="cloud cl2"></div>
+  <div class="cloud cl3"></div>
+  <div class="cloud cl4"></div>
+
+</div>
+
+<!-- ══════════════  UI  ══════════════ -->
+<div class="ui">
+
+  <div class="title">✦ MANA COLLECTOR ✦</div>
+  <div class="g20"></div>
+
   <div class="timer" id="timer">25:00</div>
+  <div class="g12"></div>
 
   <div class="progress-track" style="width:100%">
     <div class="progress-fill" id="progressFill" style="width:100%"></div>
   </div>
+  <div class="g16"></div>
 
   <div class="divider"></div>
+  <div class="g16"></div>
 
   <div class="mana-section">
     <div class="mana-label">— MANA —</div>
-    <div class="mana-num" id="manaNum">0</div>
-    <div class="pips"    id="pips"></div>
-    <div class="streak"  id="streak">RACHA: 0</div>
+    <div class="g8"></div>
+
+    <!-- Gem + number stacked: crystal behind, number in front -->
+    <div class="mana-gem-wrap">
+      <svg class="gem-icon" id="gemIcon" width="100" height="118" viewBox="0 0 42 50">
+        <polygon points="21,2 38,13 38,37 21,48 4,37 4,13"
+                 fill="rgba(68,255,204,0.06)" stroke="#44FFCC" stroke-width="1.5" opacity="0.80"/>
+        <polygon points="21,8 33,16 21,42 9,16"
+                 fill="rgba(68,255,204,0.09)"/>
+        <line x1="21" y1="2"  x2="21" y2="48" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
+        <line x1="4"  y1="13" x2="38" y2="37" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
+        <line x1="38" y1="13" x2="4"  y2="37" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
+      </svg>
+      <div class="mana-num" id="manaNum">0</div>
+    </div>
+    <div class="g6"></div>
+    <div class="pips" id="pips"></div>
+    <div class="g8"></div>
+    <div class="streak" id="streak">RACHA: 0</div>
     <div class="bonus-badge" id="bonusBadge" style="opacity:0">BONUS ACTIVO</div>
   </div>
 
+  <div class="g16"></div>
   <div class="divider"></div>
+  <div class="g16"></div>
 
   <div class="btn-row">
-    <button class="btn btn-go"   id="startBtn" onclick="toggleTimer()">INICIAR</button>
-    <button class="btn btn-stop"              onclick="resetAll()">RESET</button>
+    <button class="btn btn-go"   id="startBtn" onclick="toggleTimer()">▶  INICIAR</button>
+    <button class="btn btn-stop"              onclick="resetAll()">○  RESET</button>
   </div>
+  <div class="g12"></div>
 
   <div class="interval-wrap">
     <div class="interval-label">INTERVALO (MIN)</div>
+    <div class="g8"></div>
     <div class="interval-row">
       <button class="ibt" onclick="adjInterval(-5)">-</button>
       <div class="ival" id="ival">25</div>
       <button class="ibt" onclick="adjInterval(+5)">+</button>
     </div>
   </div>
+
 </div>
 
 <div class="flash-layer" id="flashLayer"></div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  FLAME TIERS  (one per multiple-of-5 mana)
+//  MANA TIERS  (color schemes per multiple-of-5)
 // ═══════════════════════════════════════════════════════════
-const TIERS = [
-  // 0–4   : Blue (mystical)
-  { hot:[120,230,255],  mid:[40,130,255],  cool:[10,55,200]  },
-  // 5–9   : Teal / Cyan
-  { hot:[50,255,220],   mid:[0,200,170],   cool:[0,80,120]   },
-  // 10–14 : Gold ★
-  { hot:[255,230,60],   mid:[255,155,10],  cool:[210,65,0]   },
-  // 15–19 : Crimson
-  { hot:[255,100,70],   mid:[230,30,20],   cool:[140,0,0]    },
-  // 20–24 : Pink / Arcane
-  { hot:[255,120,240],  mid:[210,50,200],  cool:[120,0,120]  },
-  // 25+   : White / Transcendent
-  { hot:[245,245,255],  mid:[180,180,255], cool:[90,90,210]  },
-];
-
-// Pip colors per tier
-const PIP_COLORS = ['#0088FF','#00CCAA','#FFD700','#FF5544','#FF66CC','#CCCCFF'];
-
-// Mana-number CSS classes per tier
-const TIER_CLASSES = ['','t1','t2','t3','t4','t5'];
+const TIER_CLASSES  = ['', 't1', 't2', 't3', 't4', 't5'];
+const PIP_COLORS    = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#CCCCFF'];
+const GEM_COLORS    = ['#44FFCC', '#22FFEE', '#FFD700', '#FF7766', '#FF88CC', '#DDDDFF'];
+const FLASH_COLORS  = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#EEEEFF'];
 
 // ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
 const S = {
-  mana:      0,
-  streak:    0,
-  interval:  25,
-  remaining: 25 * 60,
-  total:     25 * 60,
-  running:   false,
-  flameBoost: 0,
+  mana:       0,
+  streak:     0,
+  interval:   25,
+  remaining:  25 * 60,
+  total:      25 * 60,
+  running:    false,
+  warnedAt60: false,
 };
-let timerId   = null;
-let hiddenAt  = null;
+let timerId  = null;
+let hiddenAt = null;
 
 function tier() {
-  return Math.min(Math.floor(S.mana / 5), TIERS.length - 1);
+  return Math.min(Math.floor(S.mana / 5), TIER_CLASSES.length - 1);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  PIXEL-ART FLAME SIMULATION
-// ═══════════════════════════════════════════════════════════
-const FC  = document.getElementById('flameCanvas');
-const FCX = FC.getContext('2d');
-
-// Internal pixel grid — each cell = 10×10px on canvas for chunky pixel-art look
-const GW = 18, GH = 22;
-const heat = new Float32Array(GW * GH);
-
-function stepFlame() {
-  const boost = S.flameBoost;
-
-  // Seed heat at bottom THREE rows for a fuller flame base
-  for (let x = 0; x < GW; x++) {
-    heat[(GH - 1) * GW + x] = 240 + Math.random() * 15 + boost * 20;
-    heat[(GH - 2) * GW + x] = Math.random() > 0.3 ? 220 + Math.random() * 20 + boost * 15 : 180;
-    heat[(GH - 3) * GW + x] = Math.random() > 0.5 ? 190 + Math.random() * 25 + boost * 10 : 130;
-  }
-
-  // Propagate flame upward — less cooling so flame rises higher
-  for (let y = 0; y < GH - 3; y++) {
-    for (let x = 0; x < GW; x++) {
-      const l  = heat[y * GW + Math.max(x - 1, 0)];
-      const r  = heat[y * GW + Math.min(x + 1, GW - 1)];
-      const b  = heat[(y + 1) * GW + x];
-      const b2 = heat[(y + 2) * GW + x];
-      const avg  = (l + r + b + b2) / 4;
-      const cool = ((GH - y) / GH) * 1.5 + Math.random() * 1.2;
-      heat[y * GW + x] = Math.max(0, avg - cool);
-    }
-  }
-
-  if (S.flameBoost > 0) S.flameBoost = Math.max(0, S.flameBoost - 0.04);
-}
-
-function renderFlame() {
-  const W  = FC.width,  H = FC.height;
-  const pw = W / GW,   ph = H / GH;
-  const t  = TIERS[tier()];
-
-  // Dark background for contrast
-  FCX.fillStyle = 'rgba(1,4,14,0.85)';
-  FCX.fillRect(0, 0, W, H);
-
-  for (let y = 0; y < GH; y++) {
-    for (let x = 0; x < GW; x++) {
-      const h = heat[y * GW + x];
-      if (h < 6) continue;
-
-      let r, g, b, a;
-      if (h >= 130) {
-        const k = Math.min(1, (h - 130) / 125);
-        r = t.mid[0] + (t.hot[0] - t.mid[0]) * k;
-        g = t.mid[1] + (t.hot[1] - t.mid[1]) * k;
-        b = t.mid[2] + (t.hot[2] - t.mid[2]) * k;
-        a = 0.75 + k * 0.25;
-      } else if (h >= 50) {
-        const k = (h - 50) / 80;
-        r = t.cool[0] + (t.mid[0] - t.cool[0]) * k;
-        g = t.cool[1] + (t.mid[1] - t.cool[1]) * k;
-        b = t.cool[2] + (t.mid[2] - t.cool[2]) * k;
-        a = 0.35 + k * 0.45;
-      } else {
-        r = t.cool[0]; g = t.cool[1]; b = t.cool[2];
-        a = (h / 50) * 0.38;
-      }
-
-      FCX.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${a.toFixed(2)})`;
-      FCX.fillRect(x * pw | 0, y * ph | 0, (pw + 1) | 0, (ph + 1) | 0);
-    }
-  }
-
-  // Strong ambient glow at flame base
-  const [hr, hg, hb] = t.hot;
-  const grd = FCX.createRadialGradient(W / 2, H * 0.85, 4, W / 2, H * 0.85, W * 0.65);
-  grd.addColorStop(0, `rgba(${hr},${hg},${hb},0.45)`);
-  grd.addColorStop(0.4, `rgba(${hr},${hg},${hb},0.12)`);
-  grd.addColorStop(1, 'rgba(0,0,0,0)');
-  FCX.fillStyle = grd;
-  FCX.fillRect(0, 0, W, H);
-}
-
-function flameLoop() {
-  stepFlame();
-  renderFlame();
-  requestAnimationFrame(flameLoop);
-}
-
-// ═══════════════════════════════════════════════════════════
-//  STARFIELD BACKGROUND
+//  STARFIELD  (cross/plus shaped, golden, with random flares)
 // ═══════════════════════════════════════════════════════════
 const SC  = document.getElementById('stars');
 const SCX = SC.getContext('2d');
-let stars = [];
+let stars  = [];
+let lastTs = 0;
 
 function initStars() {
   SC.width  = window.innerWidth;
   SC.height = window.innerHeight;
-  stars = Array.from({ length: 90 }, () => ({
-    x:  Math.random() * SC.width,
-    y:  Math.random() * SC.height,
-    sz: Math.random() > 0.82 ? 2 : 1,
-    ph: Math.random() * Math.PI * 2,
-    sp: 0.25 + Math.random() * 0.7,
+  stars = Array.from({ length: 75 }, () => ({
+    x:    Math.random() * SC.width,
+    y:    Math.random() * SC.height * 0.88,   // fill full sky (no landscape)
+    sz:   Math.random() > 0.88 ? 3 : Math.random() > 0.65 ? 2 : 1,
+    ph:   Math.random() * Math.PI * 2,
+    sp:   0.10 + Math.random() * 0.35,
+    warm: Math.random() > 0.28,               // 72% golden, 28% cool white
+    flareCd: Math.random() * 14,              // staggered so they don't all flare at once
+    flare:   0,                               // 0..1 flare intensity
   }));
 }
 
-function starsLoop() {
+function starsLoop(ts) {
+  const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.1) : 0;
+  lastTs = ts;
+
   SCX.clearRect(0, 0, SC.width, SC.height);
-  const t = Date.now() / 1000;
+
   stars.forEach(s => {
-    const a = 0.12 + 0.55 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
-    SCX.fillStyle = `rgba(90,170,255,${a.toFixed(2)})`;
-    SCX.fillRect(s.x, s.y, s.sz, s.sz);
+    // ── Flare timer ──────────────────────────
+    s.flareCd -= dt;
+    if (s.flareCd <= 0) {
+      s.flare   = 1.0;
+      s.flareCd = 6 + Math.random() * 20;   // next flare in 6-26 s
+    }
+    if (s.flare > 0) {
+      s.flare = Math.max(0, s.flare - dt * 1.1);  // fade over ~0.9 s
+    }
+
+    // ── Base twinkle alpha ────────────────────
+    const baseA  = 0.08 + 0.62 * (0.5 + 0.5 * Math.sin(ts * 0.001 * s.sp + s.ph));
+    const totalA = Math.min(1, baseA + s.flare * 0.92);
+
+    const { x, y, sz } = s;
+    const isWarm = s.warm;
+
+    // ── Sparkle glow when flaring ─────────────
+    if (s.flare > 0.05) {
+      const fl    = s.flare;
+      const reach = sz + fl * 6;
+      SCX.fillStyle = isWarm
+        ? `rgba(255,230,110,${(fl * 0.30).toFixed(2)})`
+        : `rgba(200,230,255,${(fl * 0.26).toFixed(2)})`;
+      // Long thin arms (4-point sparkle)
+      SCX.fillRect(x - reach * 2.5, y, reach * 5 + 1, 1);
+      SCX.fillRect(x, y - reach * 2.5, 1, reach * 5 + 1);
+    }
+
+    // ── Star body ─────────────────────────────
+    SCX.fillStyle = isWarm
+      ? `rgba(255,215,75,${totalA.toFixed(2)})`
+      : `rgba(210,238,255,${totalA.toFixed(2)})`;
+    if (sz === 1) {
+      SCX.fillRect(x, y, 1, 1);
+    } else {
+      SCX.fillRect(x - sz, y,      sz * 2 + 1, 1);
+      SCX.fillRect(x,      y - sz, 1, sz * 2 + 1);
+    }
+
+    // ── Bright core during flare ──────────────
+    if (s.flare > 0.15) {
+      SCX.fillStyle = isWarm
+        ? `rgba(255,252,220,${(s.flare * 0.95).toFixed(2)})`
+        : `rgba(240,250,255,${(s.flare * 0.95).toFixed(2)})`;
+      SCX.fillRect(x - 1, y - 1, 3, 3);
+    }
   });
+
   requestAnimationFrame(starsLoop);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RETRO AUDIO  (Web Audio API — no external files)
+// ═══════════════════════════════════════════════════════════
+let _audioCtx = null;
+
+function getAudio() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+function playNote(ctx, freq, startOffset, dur, vol = 0.28, wave = 'square') {
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = wave;
+  osc.frequency.setValueAtTime(freq, ctx.currentTime + startOffset);
+  gain.gain.setValueAtTime(0, ctx.currentTime + startOffset);
+  gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + startOffset + 0.01);
+  gain.gain.setValueAtTime(vol, ctx.currentTime + startOffset + dur - 0.015);
+  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + startOffset + dur);
+  osc.start(ctx.currentTime + startOffset);
+  osc.stop(ctx.currentTime + startOffset + dur + 0.01);
+}
+
+// 1-minute warning — triple arcade beep, descending
+function playWarningSound() {
+  try {
+    const ctx = getAudio();
+    [[880,0.00,0.08],[880,0.13,0.08],[880,0.26,0.08],[587,0.40,0.22]]
+      .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.25));
+  } catch(e) {}
+}
+
+// Completion fanfare — ascending 8-bit jingle (C-E-G-C)
+function playCompleteSound() {
+  try {
+    const ctx = getAudio();
+    [[523,0.00,0.11],[659,0.13,0.11],[784,0.26,0.11],
+     [1047,0.40,0.11],[784,0.53,0.08],[1047,0.63,0.35]]
+      .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.30));
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MOON BURST  (CSS animation on completion)
+// ═══════════════════════════════════════════════════════════
+function moonBurst() {
+  const el = document.getElementById('moonWrap');
+  el.classList.remove('moon-burst');
+  void el.offsetWidth;           // force reflow to restart animation
+  el.classList.add('moon-burst');
 }
 
 // ═══════════════════════════════════════════════════════════
 //  TIMER
 // ═══════════════════════════════════════════════════════════
 function fmt(s) {
-  return `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
+  return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
 }
 
 function refreshTimer() {
   const el  = document.getElementById('timer');
   const pct = S.remaining / S.total;
   el.textContent = fmt(S.remaining);
-  el.className   = 'timer' + (pct < 0.15 ? ' urgent' : pct < 0.33 ? ' warn' : '');
+  // White → cyan → gold → orange → red as time runs out
+  let cls = 'timer';
+  if      (pct < 0.08) cls += ' tc4';
+  else if (pct < 0.22) cls += ' tc3';
+  else if (pct < 0.40) cls += ' tc2';
+  else if (pct < 0.65) cls += ' tc1';
+  // else: white (> 65%, no extra class)
+  el.className = cls;
 }
 
 function refreshProgress() {
   const pct  = S.total > 0 ? S.remaining / S.total : 1;
   const fill = document.getElementById('progressFill');
   fill.style.width = (pct * 100) + '%';
-  const p = pct * 100;
-  const [col, shadow] = p > 55 ? ['#0088FF','#0088FF']
-                      : p > 25 ? ['#4455FF','#4455FF']
-                      :          ['#FF4466','#FF4466'];
+  // Match timer color stages
+  let col;
+  if      (pct < 0.08) col = '#FF3355';
+  else if (pct < 0.22) col = '#FF8C22';
+  else if (pct < 0.40) col = '#FFCC44';
+  else if (pct < 0.65) col = '#44FFEE';
+  else                 col = '#C0EEFF';
   fill.style.background = col;
-  fill.style.boxShadow  = `0 0 8px ${shadow}`;
+  fill.style.boxShadow  = `0 0 7px ${col}`;
 }
 
 function toggleTimer() {
@@ -522,15 +662,16 @@ function toggleTimer() {
 
 function startTimer() {
   if (S.remaining <= 0) return;
+  getAudio();
   S.running = true;
-  document.getElementById('startBtn').textContent = 'PAUSAR';
+  document.getElementById('startBtn').textContent = '⏸  PAUSAR';
   timerId = setInterval(tick, 1000);
 }
 
 function pauseTimer() {
   clearInterval(timerId);
   S.running = false;
-  document.getElementById('startBtn').textContent = 'REANUDAR';
+  document.getElementById('startBtn').textContent = '▶  REANUDAR';
 }
 
 function tick() {
@@ -538,6 +679,10 @@ function tick() {
   S.remaining--;
   refreshTimer();
   refreshProgress();
+  if (S.remaining === 60 && !S.warnedAt60) {
+    S.warnedAt60 = true;
+    playWarningSound();
+  }
   if (S.remaining <= 0) completePomodoro();
 }
 
@@ -546,12 +691,13 @@ function completePomodoro() {
   S.running = false;
   S.streak++;
 
-  // 1 base mana + 1 bonus per 5 consecutive
   const bonus  = Math.floor(S.streak / 5);
   const earned = 1 + bonus;
   S.mana += earned;
 
-  S.flameBoost = 4;  // flame burst animation
+  S.warnedAt60 = false;
+  moonBurst();
+  playCompleteSound();
   refreshMana();
   showFlash(earned, bonus);
 
@@ -559,20 +705,21 @@ function completePomodoro() {
   S.total     = S.remaining;
   refreshTimer();
   refreshProgress();
-  document.getElementById('startBtn').textContent = 'INICIAR';
+  document.getElementById('startBtn').textContent = '▶  INICIAR';
 }
 
 function resetAll() {
   clearInterval(timerId);
-  S.running   = false;
-  S.mana      = 0;
-  S.streak    = 0;
-  S.remaining = S.interval * 60;
-  S.total     = S.remaining;
+  S.running    = false;
+  S.mana       = 0;
+  S.streak     = 0;
+  S.warnedAt60 = false;
+  S.remaining  = S.interval * 60;
+  S.total      = S.remaining;
   refreshTimer();
   refreshProgress();
   refreshMana();
-  document.getElementById('startBtn').textContent = 'INICIAR';
+  document.getElementById('startBtn').textContent = '▶  INICIAR';
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -580,25 +727,41 @@ function resetAll() {
 // ═══════════════════════════════════════════════════════════
 function refreshMana() {
   const t   = tier();
+  const col = GEM_COLORS[t];
+
+  // Number
   const num = document.getElementById('manaNum');
   num.textContent = S.mana;
   num.className   = 'mana-num ' + (TIER_CLASSES[t] || '');
 
+  // Gem icon recolor
+  const gem = document.getElementById('gemIcon');
+  gem.querySelectorAll('polygon, line').forEach(el => {
+    if (el.getAttribute('stroke')) el.setAttribute('stroke', col);
+    const f = el.getAttribute('fill');
+    if (f && f !== 'none' && f.startsWith('rgba')) {
+      // keep alpha, swap color
+      el.setAttribute('fill', f.replace(/[\d.]+,[\d.]+,[\d.]+/, hexToRgb(col)));
+    }
+  });
+
+  // Streak
   document.getElementById('streak').textContent = `RACHA: ${S.streak}`;
 
+  // Bonus badge
   const badge = document.getElementById('bonusBadge');
   badge.style.opacity = S.streak >= 5 ? '1' : '0';
   if (S.streak >= 5) badge.textContent = `BONUS x${Math.floor(S.streak / 5) + 1}`;
 
-  // Pip grid — show up to 25 pips
+  // Pips (up to 25)
   const pipsEl = document.getElementById('pips');
   pipsEl.innerHTML = '';
   const show = Math.min(S.mana, 25);
   for (let i = 0; i < show; i++) {
-    const pipTier = Math.min(Math.floor(i / 5), PIP_COLORS.length - 1);
-    const div     = document.createElement('div');
+    const pt  = Math.min(Math.floor(i / 5), PIP_COLORS.length - 1);
+    const div = document.createElement('div');
     div.className = 'pip on';
-    div.style.setProperty('--pc', PIP_COLORS[pipTier]);
+    div.style.setProperty('--pc', PIP_COLORS[pt]);
     pipsEl.appendChild(div);
   }
   if (S.mana > 25) {
@@ -609,19 +772,22 @@ function refreshMana() {
   }
 }
 
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
 // ═══════════════════════════════════════════════════════════
 //  COMPLETION FLASH
 // ═══════════════════════════════════════════════════════════
 function showFlash(earned, bonus) {
-  const t      = tier();
-  const colors = ['#00EEFF','#00FFCC','#FFD700','#FF6644','#FF88CC','#EEEEFF'];
-  const col    = colors[t] || '#00EEFF';
-  const layer  = document.getElementById('flashLayer');
-
+  const col   = FLASH_COLORS[tier()];
+  const layer = document.getElementById('flashLayer');
   const bonusLine = bonus > 0
     ? `<div style="font-size:7px;color:#FFCC44;text-shadow:0 0 8px #FFAA00;margin-top:4px">BONUS RACHA +${bonus}</div>`
     : '';
-
   layer.innerHTML = `
     <div class="flash-msg" style="border-color:${col};color:${col};text-shadow:0 0 16px ${col}">
       +${earned} MANA
@@ -646,7 +812,7 @@ function adjInterval(d) {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  BACKGROUND / VISIBILITY  (catch up lost time on return)
+//  VISIBILITY — catch up lost time when app returns
 // ═══════════════════════════════════════════════════════════
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
@@ -666,10 +832,7 @@ document.addEventListener('visibilitychange', () => {
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('load', () => {
   initStars();
-  starsLoop();
-  // Pre-warm flame so it's already fully developed on first render
-  for (let i = 0; i < 150; i++) stepFlame();
-  flameLoop();
+  requestAnimationFrame(starsLoop);
   refreshTimer();
   refreshProgress();
   refreshMana();
