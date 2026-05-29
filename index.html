@@ -27,7 +27,6 @@
       position: fixed;
       inset: 0;
       z-index: 0;
-      /* Night sky gradient */
       background: linear-gradient(180deg,
         #05071A 0%,
         #090E30 18%,
@@ -38,7 +37,6 @@
       );
     }
 
-    /* Stars canvas */
     #stars {
       position: fixed;
       inset: 0;
@@ -46,29 +44,7 @@
       z-index: 1;
     }
 
-    /* ── MOON ── */
-    .moon-wrap {
-      position: fixed;
-      top: max(calc(env(safe-area-inset-top, 0px) + 52px), 58px);
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2;
-      animation: moonBreath 16s ease-in-out infinite;
-    }
-    @keyframes moonBreath {
-      0%,100% { opacity: 0.68; filter: drop-shadow(0 0 8px rgba(232,248,255,0.22)); }
-      50%     { opacity: 1.00; filter: drop-shadow(0 0 22px rgba(232,248,255,0.60)); }
-    }
-    .moon-wrap.moon-burst {
-      animation: moonFlare 1.4s ease-out forwards, moonBreath 16s ease-in-out 1.4s infinite;
-    }
-    @keyframes moonFlare {
-      0%  { opacity: 0.8; filter: drop-shadow(0 0 12px rgba(232,248,255,0.38)); }
-      25% { opacity: 1.0; filter: drop-shadow(0 0 44px rgba(255,255,255,0.92)); }
-      100%{ opacity: 0.9; filter: drop-shadow(0 0 18px rgba(232,248,255,0.45)); }
-    }
-
-    /* ── CLOUDS (blurred CSS shapes) ── */
+    /* ── CLOUDS ── */
     .cloud { position: fixed; pointer-events: none; z-index: 3; border-radius: 50%; }
     .cl1 { width:240px; height:160px; top:22%; left:-70px;
            background: radial-gradient(ellipse 68% 58% at 62% 50%, #231650 0%, #170E3A 45%, transparent 100%);
@@ -83,7 +59,7 @@
            background: radial-gradient(ellipse 70% 60% at 35% 50%, #180E38 0%, transparent 100%);
            filter: blur(22px); }
 
-    /* Subtle scanlines */
+    /* Scanlines */
     body::after {
       content: '';
       position: fixed;
@@ -97,7 +73,7 @@
     }
 
     /* ══════════════════════════════════════════
-       UI  — overlay on scene
+       UI — overlay
     ══════════════════════════════════════════ */
     .ui {
       position: relative;
@@ -106,9 +82,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      /* push content below the moon (58px tall @ top:30px) + notch/safe-area + breathing room */
-      padding-top: max(148px, calc(env(safe-area-inset-top, 0px) + 134px));
+      justify-content: center;
+      padding-top: max(16px, env(safe-area-inset-top, 16px));
       padding-right: 22px;
       padding-left: 22px;
       padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
@@ -124,53 +99,20 @@
       text-shadow: 0 0 10px rgba(100,150,220,0.35);
     }
 
-    /* ── TIMER — 5-stage color progression (white → red) ── */
+    /* ── TIMER ── */
     .timer {
       font-size: 54px;
       letter-spacing: 5px;
-      /* Stage 0: > 65% — almost white */
       color: #E8F8FF;
       text-shadow: 0 0 14px rgba(200,240,255,0.55), 0 0 30px rgba(160,220,255,0.20);
       line-height: 1;
       text-align: center;
       transition: color .8s, text-shadow .8s;
     }
-    .timer.tc1 {
-      /* Stage 1: 40-65% — cyan */
-      color: #44FFEE;
-      text-shadow: 0 0 14px rgba(68,255,238,0.65), 0 0 30px rgba(0,200,180,0.25);
-    }
-    .timer.tc2 {
-      /* Stage 2: 22-40% — gold */
-      color: #FFCC44;
-      text-shadow: 0 0 14px rgba(255,200,60,0.72), 0 0 30px rgba(255,160,0,0.28);
-    }
-    .timer.tc3 {
-      /* Stage 3: 8-22% — orange */
-      color: #FF8C22;
-      text-shadow: 0 0 14px rgba(255,140,34,0.78), 0 0 30px rgba(255,100,0,0.32);
-    }
-    .timer.tc4 {
-      /* Stage 4: < 8% — red */
-      color: #FF3355;
-      text-shadow: 0 0 16px rgba(255,50,85,0.85), 0 0 32px rgba(220,0,30,0.40);
-    }
-
-    /* ── PROGRESS BAR ── */
-    .progress-track {
-      width: 100%;
-      max-width: 350px;
-      height: 8px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: #FF8899;
-      box-shadow: 0 0 7px #FF8899;
-      transition: width 1s linear, background .5s, box-shadow .5s;
-    }
+    .timer.tc1 { color: #44FFEE; text-shadow: 0 0 14px rgba(68,255,238,0.65), 0 0 30px rgba(0,200,180,0.25); }
+    .timer.tc2 { color: #FFCC44; text-shadow: 0 0 14px rgba(255,200,60,0.72), 0 0 30px rgba(255,160,0,0.28); }
+    .timer.tc3 { color: #FFF0A0; text-shadow: 0 0 14px rgba(255,240,140,0.80), 0 0 30px rgba(255,220,80,0.35); }
+    .timer.tc4 { color: #00FF88; text-shadow: 0 0 16px rgba(0,255,136,0.88), 0 0 32px rgba(0,200,100,0.40); }
 
     /* ── DIVIDER ── */
     .divider {
@@ -192,10 +134,14 @@
     .mana-label {
       font-size: 7px;
       color: #557799;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+    .mana-label span {
+      color: #88CCFF;
     }
 
-    /* Gem + number stacked container */
+    /* Gem + number stacked */
     .mana-gem-wrap {
       position: relative;
       display: flex;
@@ -204,8 +150,6 @@
       width: 100px;
       height: 118px;
     }
-
-    /* Gem icon — behind the number */
     .gem-icon {
       position: absolute;
       top: 50%;
@@ -213,8 +157,6 @@
       transform: translate(-50%, -50%);
       z-index: 0;
     }
-
-    /* Mana number — on top of the gem */
     .mana-num {
       position: relative;
       z-index: 1;
@@ -226,7 +168,7 @@
       min-width: 3ch;
     }
     .mana-num.t1 { color: #44FFEE; text-shadow: 0 0 10px rgba(68,255,238,.70); }
-    .mana-num.t2 { color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,.75),  0 0 22px rgba(255,170,0,.30); }
+    .mana-num.t2 { color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,.75), 0 0 22px rgba(255,170,0,.30); }
     .mana-num.t3 { color: #FF7766; text-shadow: 0 0 10px rgba(255,100,80,.70); }
     .mana-num.t4 { color: #FF88CC; text-shadow: 0 0 10px rgba(255,136,204,.70); }
     .mana-num.t5 { color: #EEEEFF; text-shadow: 0 0 12px rgba(220,220,255,.90); }
@@ -252,14 +194,10 @@
     .pip-extra { font-size: 6px; color: #446688; align-self: center; }
 
     .streak {
-      font-size: 8px;
+      font-size: 7px;
       color: #44FF88;
       text-shadow: 0 0 6px rgba(68,255,136,0.50);
-    }
-    .bonus-badge {
-      font-size: 6px;
-      color: #FFCC44;
-      text-shadow: 0 0 6px #FFAA00;
+      text-align: center;
       letter-spacing: 1px;
     }
 
@@ -292,6 +230,13 @@
                 box-shadow: 0 0 10px rgba(68,255,204,.18), inset 0 0 10px rgba(68,255,204,.04); }
     .btn-stop { color: #FF5566; border-color: #FF5566;
                 box-shadow: 0 0 10px rgba(255,85,102,.18), inset 0 0 10px rgba(255,85,102,.04); }
+    .btn-seal {
+      color: #88CCFF;
+      border-color: #88CCFF;
+      box-shadow: 0 0 10px rgba(136,204,255,0.22), inset 0 0 10px rgba(136,204,255,0.05);
+      width: 100%;
+      max-width: 350px;
+    }
 
     /* ── INTERVAL ── */
     .interval-wrap {
@@ -342,7 +287,7 @@
       to   { transform: translateY(-70px); opacity: 0; }
     }
 
-    /* Spacing utility */
+    /* Spacing */
     .g6  { height: 6px; }
     .g8  { height: 8px; }
     .g12 { height: 12px; }
@@ -357,40 +302,10 @@
 <div class="scene">
   <canvas id="stars"></canvas>
 
-  <!-- Crescent moon (SVG mask) -->
-  <div class="moon-wrap" id="moonWrap">
-    <svg width="58" height="58" viewBox="0 0 116 116">
-      <defs>
-        <mask id="cres">
-          <rect width="116" height="116" fill="black"/>
-          <circle cx="62" cy="56" r="46" fill="white"/>
-          <circle cx="38" cy="47" r="40" fill="black"/>
-        </mask>
-      </defs>
-      <!-- Body -->
-      <circle cx="62" cy="56" r="46" fill="#E8F8FF" mask="url(#cres)"/>
-      <!-- Highlight -->
-      <circle cx="76" cy="40" r="16" fill="#FFFFFF" opacity="0.50" mask="url(#cres)"/>
-      <!-- Shadow (subtle cool tone) -->
-      <ellipse cx="60" cy="72" rx="24" ry="18" fill="#90B8CC" opacity="0.22" mask="url(#cres)"/>
-      <!-- Pixel texture (crater-like marks) -->
-      <g mask="url(#cres)" fill="#7AAABB" opacity="0.18">
-        <rect x="57" y="32" width="4" height="4"/>
-        <rect x="74" y="52" width="3" height="3"/>
-        <rect x="64" y="64" width="4" height="4"/>
-        <rect x="48" y="48" width="3" height="3"/>
-        <rect x="82" y="40" width="2" height="2"/>
-        <rect x="52" y="70" width="2" height="2"/>
-      </g>
-    </svg>
-  </div>
-
-  <!-- Clouds -->
   <div class="cloud cl1"></div>
   <div class="cloud cl2"></div>
   <div class="cloud cl3"></div>
   <div class="cloud cl4"></div>
-
 </div>
 
 <!-- ══════════════  UI  ══════════════ -->
@@ -400,23 +315,29 @@
   <div class="g20"></div>
 
   <div class="timer" id="timer">25:00</div>
-  <div class="g12"></div>
-
-  <div class="progress-track" style="width:100%">
-    <div class="progress-fill" id="progressFill" style="width:100%"></div>
-  </div>
   <div class="g16"></div>
 
   <div class="divider"></div>
   <div class="g16"></div>
 
   <div class="mana-section">
-    <div class="mana-label">— MANA —</div>
+    <div class="mana-label">MANA SELLADO: <span id="sealedManaDisplay">0</span></div>
     <div class="g8"></div>
 
-    <!-- Gem + number stacked: crystal behind, number in front -->
+    <!-- Crystal gem = progress indicator + mana display -->
     <div class="mana-gem-wrap">
       <svg class="gem-icon" id="gemIcon" width="100" height="118" viewBox="0 0 42 50">
+        <defs>
+          <clipPath id="gemFillClip">
+            <rect id="gemFillRect" x="-1" y="50" width="44" height="51"/>
+          </clipPath>
+        </defs>
+        <!-- Progress fill: rises from bottom as timer counts down -->
+        <polygon id="gemFillPoly"
+                 points="21,2 38,13 38,37 21,48 4,37 4,13"
+                 fill="rgba(192,238,255,0.30)"
+                 clip-path="url(#gemFillClip)"/>
+        <!-- Crystal outline -->
         <polygon points="21,2 38,13 38,37 21,48 4,37 4,13"
                  fill="rgba(68,255,204,0.06)" stroke="#44FFCC" stroke-width="1.5" opacity="0.80"/>
         <polygon points="21,8 33,16 21,42 9,16"
@@ -427,11 +348,11 @@
       </svg>
       <div class="mana-num" id="manaNum">0</div>
     </div>
+
     <div class="g6"></div>
     <div class="pips" id="pips"></div>
     <div class="g8"></div>
-    <div class="streak" id="streak">RACHA: 0</div>
-    <div class="bonus-badge" id="bonusBadge" style="opacity:0">BONUS ACTIVO</div>
+    <div class="streak" id="streak">MANA RECOLECTADO: 0</div>
   </div>
 
   <div class="g16"></div>
@@ -439,8 +360,8 @@
   <div class="g16"></div>
 
   <div class="btn-row">
-    <button class="btn btn-go"   id="startBtn" onclick="toggleTimer()">▶  INICIAR</button>
-    <button class="btn btn-stop"              onclick="resetAll()">○  RESET</button>
+    <button class="btn btn-go"  id="startBtn" onclick="toggleTimer()">INICIAR</button>
+    <button class="btn btn-stop"             onclick="resetAll()">RESET</button>
   </div>
   <div class="g12"></div>
 
@@ -454,25 +375,30 @@
     </div>
   </div>
 
+  <div class="g20"></div>
+
+  <!-- Sellar Mana -->
+  <button class="btn btn-seal" onclick="sealMana()">SELLAR MANA</button>
+
 </div>
 
 <div class="flash-layer" id="flashLayer"></div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  MANA TIERS  (color schemes per multiple-of-5)
+//  MANA TIERS
 // ═══════════════════════════════════════════════════════════
-const TIER_CLASSES  = ['', 't1', 't2', 't3', 't4', 't5'];
-const PIP_COLORS    = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#CCCCFF'];
-const GEM_COLORS    = ['#44FFCC', '#22FFEE', '#FFD700', '#FF7766', '#FF88CC', '#DDDDFF'];
-const FLASH_COLORS  = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#EEEEFF'];
+const TIER_CLASSES = ['', 't1', 't2', 't3', 't4', 't5'];
+const PIP_COLORS   = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#CCCCFF'];
+const GEM_COLORS   = ['#44FFCC', '#22FFEE', '#FFD700', '#FF7766', '#FF88CC', '#DDDDFF'];
+const FLASH_COLORS = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#EEEEFF'];
 
 // ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
 const S = {
   mana:       0,
-  streak:     0,
+  sealedMana: 0,
   interval:   25,
   remaining:  25 * 60,
   total:      25 * 60,
@@ -486,8 +412,50 @@ function tier() {
   return Math.min(Math.floor(S.mana / 5), TIER_CLASSES.length - 1);
 }
 
+// Mana earned per pomodoro based on duration
+function getManaReward() {
+  if (S.interval >= 30) return 3;
+  if (S.interval >= 20) return 2;
+  return 1; // 1–19 min
+}
+
+// ── Persistence ──────────────────────────────────────────
+function saveState() {
+  try {
+    localStorage.setItem('pomodoro_state', JSON.stringify({
+      mana:       S.mana,
+      sealedMana: S.sealedMana,
+      interval:   S.interval,
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const d = JSON.parse(localStorage.getItem('pomodoro_state') || '{}');
+    if (typeof d.mana       === 'number') S.mana       = d.mana;
+    if (typeof d.sealedMana === 'number') S.sealedMana = d.sealedMana;
+    if (typeof d.interval   === 'number') {
+      S.interval  = Math.max(1, Math.min(90, d.interval));
+      S.remaining = S.interval * 60;
+      S.total     = S.remaining;
+    }
+  } catch(e) {}
+}
+
+// ── Seal session mana ────────────────────────────────────
+function sealMana() {
+  if (S.mana === 0) return;
+  S.sealedMana += S.mana;
+  S.mana = 0;
+  saveState();
+  playSealSound();
+  refreshMana();
+  refreshProgress();
+}
+
 // ═══════════════════════════════════════════════════════════
-//  STARFIELD  (cross/plus shaped, golden, with random flares)
+//  STARFIELD
 // ═══════════════════════════════════════════════════════════
 const SC  = document.getElementById('stars');
 const SCX = SC.getContext('2d');
@@ -499,53 +467,39 @@ function initStars() {
   SC.height = window.innerHeight;
   stars = Array.from({ length: 75 }, () => ({
     x:    Math.random() * SC.width,
-    y:    Math.random() * SC.height * 0.88,   // fill full sky (no landscape)
+    y:    Math.random() * SC.height * 0.88,
     sz:   Math.random() > 0.88 ? 3 : Math.random() > 0.65 ? 2 : 1,
     ph:   Math.random() * Math.PI * 2,
     sp:   0.10 + Math.random() * 0.35,
-    warm: Math.random() > 0.28,               // 72% golden, 28% cool white
-    flareCd: Math.random() * 14,              // staggered so they don't all flare at once
-    flare:   0,                               // 0..1 flare intensity
+    warm: Math.random() > 0.28,
+    flareCd: Math.random() * 14,
+    flare:   0,
   }));
 }
 
 function starsLoop(ts) {
   const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.1) : 0;
   lastTs = ts;
-
   SCX.clearRect(0, 0, SC.width, SC.height);
-
   stars.forEach(s => {
-    // ── Flare timer ──────────────────────────
     s.flareCd -= dt;
-    if (s.flareCd <= 0) {
-      s.flare   = 1.0;
-      s.flareCd = 6 + Math.random() * 20;   // next flare in 6-26 s
-    }
-    if (s.flare > 0) {
-      s.flare = Math.max(0, s.flare - dt * 1.1);  // fade over ~0.9 s
-    }
+    if (s.flareCd <= 0) { s.flare = 1.0; s.flareCd = 6 + Math.random() * 20; }
+    if (s.flare > 0) s.flare = Math.max(0, s.flare - dt * 1.1);
 
-    // ── Base twinkle alpha ────────────────────
     const baseA  = 0.08 + 0.62 * (0.5 + 0.5 * Math.sin(ts * 0.001 * s.sp + s.ph));
     const totalA = Math.min(1, baseA + s.flare * 0.92);
-
     const { x, y, sz } = s;
     const isWarm = s.warm;
 
-    // ── Sparkle glow when flaring ─────────────
     if (s.flare > 0.05) {
-      const fl    = s.flare;
-      const reach = sz + fl * 6;
+      const reach = sz + s.flare * 6;
       SCX.fillStyle = isWarm
-        ? `rgba(255,230,110,${(fl * 0.30).toFixed(2)})`
-        : `rgba(200,230,255,${(fl * 0.26).toFixed(2)})`;
-      // Long thin arms (4-point sparkle)
+        ? `rgba(255,230,110,${(s.flare * 0.30).toFixed(2)})`
+        : `rgba(200,230,255,${(s.flare * 0.26).toFixed(2)})`;
       SCX.fillRect(x - reach * 2.5, y, reach * 5 + 1, 1);
       SCX.fillRect(x, y - reach * 2.5, 1, reach * 5 + 1);
     }
 
-    // ── Star body ─────────────────────────────
     SCX.fillStyle = isWarm
       ? `rgba(255,215,75,${totalA.toFixed(2)})`
       : `rgba(210,238,255,${totalA.toFixed(2)})`;
@@ -556,7 +510,6 @@ function starsLoop(ts) {
       SCX.fillRect(x,      y - sz, 1, sz * 2 + 1);
     }
 
-    // ── Bright core during flare ──────────────
     if (s.flare > 0.15) {
       SCX.fillStyle = isWarm
         ? `rgba(255,252,220,${(s.flare * 0.95).toFixed(2)})`
@@ -564,26 +517,22 @@ function starsLoop(ts) {
       SCX.fillRect(x - 1, y - 1, 3, 3);
     }
   });
-
   requestAnimationFrame(starsLoop);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  RETRO AUDIO  (Web Audio API — no external files)
+//  RETRO AUDIO
 // ═══════════════════════════════════════════════════════════
 let _audioCtx = null;
-
 function getAudio() {
   if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (_audioCtx.state === 'suspended') _audioCtx.resume();
   return _audioCtx;
 }
-
 function playNote(ctx, freq, startOffset, dur, vol = 0.28, wave = 'square') {
   const osc  = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
+  osc.connect(gain); gain.connect(ctx.destination);
   osc.type = wave;
   osc.frequency.setValueAtTime(freq, ctx.currentTime + startOffset);
   gain.gain.setValueAtTime(0, ctx.currentTime + startOffset);
@@ -593,8 +542,6 @@ function playNote(ctx, freq, startOffset, dur, vol = 0.28, wave = 'square') {
   osc.start(ctx.currentTime + startOffset);
   osc.stop(ctx.currentTime + startOffset + dur + 0.01);
 }
-
-// 1-minute warning — triple arcade beep, descending
 function playWarningSound() {
   try {
     const ctx = getAudio();
@@ -602,8 +549,15 @@ function playWarningSound() {
       .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.25));
   } catch(e) {}
 }
+function playSealSound() {
+  try {
+    const ctx = getAudio();
+    // Crystal chime — ascending triangle wave, warm and satisfying
+    [[1047,0.00,0.10],[1319,0.12,0.10],[1568,0.24,0.10],[2093,0.36,0.30]]
+      .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.20, 'triangle'));
+  } catch(e) {}
+}
 
-// Completion fanfare — ascending 8-bit jingle (C-E-G-C)
 function playCompleteSound() {
   try {
     const ctx = getAudio();
@@ -611,16 +565,6 @@ function playCompleteSound() {
      [1047,0.40,0.11],[784,0.53,0.08],[1047,0.63,0.35]]
       .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.30));
   } catch(e) {}
-}
-
-// ═══════════════════════════════════════════════════════════
-//  MOON BURST  (CSS animation on completion)
-// ═══════════════════════════════════════════════════════════
-function moonBurst() {
-  const el = document.getElementById('moonWrap');
-  el.classList.remove('moon-burst');
-  void el.offsetWidth;           // force reflow to restart animation
-  el.classList.add('moon-burst');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -634,47 +578,51 @@ function refreshTimer() {
   const el  = document.getElementById('timer');
   const pct = S.remaining / S.total;
   el.textContent = fmt(S.remaining);
-  // White → cyan → gold → orange → red as time runs out
   let cls = 'timer';
   if      (pct < 0.08) cls += ' tc4';
   else if (pct < 0.22) cls += ' tc3';
   else if (pct < 0.40) cls += ' tc2';
   else if (pct < 0.65) cls += ' tc1';
-  // else: white (> 65%, no extra class)
   el.className = cls;
 }
 
+// ── Crystal progress fill ─────────────────────────────────
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 function refreshProgress() {
-  const pct  = S.total > 0 ? S.remaining / S.total : 1;
-  const fill = document.getElementById('progressFill');
-  fill.style.width = (pct * 100) + '%';
-  // Match timer color stages
+  const pct = S.total > 0 ? S.remaining / S.total : 1;
+  // Crystal charges as time passes: pct 1→0 fills rect from y=50 down to y=0
+  const fillRect = document.getElementById('gemFillRect');
+  const fillPoly = document.getElementById('gemFillPoly');
+  if (fillRect) fillRect.setAttribute('y', (50 * pct).toFixed(2));
   let col;
-  if      (pct < 0.08) col = '#FF3355';
-  else if (pct < 0.22) col = '#FF8C22';
+  if      (pct < 0.08) col = '#00FF88';
+  else if (pct < 0.22) col = '#FFF0A0';
   else if (pct < 0.40) col = '#FFCC44';
   else if (pct < 0.65) col = '#44FFEE';
   else                 col = '#C0EEFF';
-  fill.style.background = col;
-  fill.style.boxShadow  = `0 0 7px ${col}`;
+  if (fillPoly) fillPoly.setAttribute('fill', hexToRgba(col, 0.38));
 }
 
-function toggleTimer() {
-  S.running ? pauseTimer() : startTimer();
-}
+function toggleTimer() { S.running ? pauseTimer() : startTimer(); }
 
 function startTimer() {
   if (S.remaining <= 0) return;
   getAudio();
   S.running = true;
-  document.getElementById('startBtn').textContent = '⏸  PAUSAR';
+  document.getElementById('startBtn').textContent = 'PAUSAR';
   timerId = setInterval(tick, 1000);
 }
 
 function pauseTimer() {
   clearInterval(timerId);
   S.running = false;
-  document.getElementById('startBtn').textContent = '▶  REANUDAR';
+  document.getElementById('startBtn').textContent = 'REANUDAR';
 }
 
 function tick() {
@@ -692,69 +640,72 @@ function tick() {
 function completePomodoro() {
   clearInterval(timerId);
   S.running = false;
-  S.streak++;
 
-  const bonus  = Math.floor(S.streak / 5);
-  const earned = 1 + bonus;
+  const earned = getManaReward();
   S.mana += earned;
-
   S.warnedAt60 = false;
-  moonBurst();
+
+  saveState();
   playCompleteSound();
   refreshMana();
-  showFlash(earned, bonus);
+  showFlash(earned);
 
   S.remaining = S.interval * 60;
   S.total     = S.remaining;
   refreshTimer();
   refreshProgress();
-  document.getElementById('startBtn').textContent = '▶  INICIAR';
+  document.getElementById('startBtn').textContent = 'INICIAR';
 }
 
 function resetAll() {
   clearInterval(timerId);
   S.running    = false;
   S.mana       = 0;
-  S.streak     = 0;
   S.warnedAt60 = false;
   S.remaining  = S.interval * 60;
   S.total      = S.remaining;
+  saveState();
   refreshTimer();
   refreshProgress();
   refreshMana();
-  document.getElementById('startBtn').textContent = '▶  INICIAR';
+  document.getElementById('startBtn').textContent = 'INICIAR';
 }
 
 // ═══════════════════════════════════════════════════════════
 //  MANA DISPLAY
 // ═══════════════════════════════════════════════════════════
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
 function refreshMana() {
   const t   = tier();
   const col = GEM_COLORS[t];
 
-  // Number
   const num = document.getElementById('manaNum');
   num.textContent = S.mana;
   num.className   = 'mana-num ' + (TIER_CLASSES[t] || '');
 
-  // Gem icon recolor
+  // Recolor crystal (skip progress fill polygon)
   const gem = document.getElementById('gemIcon');
   gem.querySelectorAll('polygon, line').forEach(el => {
+    if (el.id === 'gemFillPoly') return;
     if (el.getAttribute('stroke')) el.setAttribute('stroke', col);
     const f = el.getAttribute('fill');
     if (f && f !== 'none' && f.startsWith('rgba')) {
-      // keep alpha, swap color
       el.setAttribute('fill', f.replace(/[\d.]+,[\d.]+,[\d.]+/, hexToRgb(col)));
     }
   });
 
-  // Streak
-  document.getElementById('streak').textContent = `RACHA: ${S.streak}`;
+  // Sealed mana
+  const sealedEl = document.getElementById('sealedManaDisplay');
+  if (sealedEl) sealedEl.textContent = S.sealedMana;
 
-  // Bonus badge
-  const badge = document.getElementById('bonusBadge');
-  badge.style.opacity = S.streak >= 5 ? '1' : '0';
-  if (S.streak >= 5) badge.textContent = `BONUS x${Math.floor(S.streak / 5) + 1}`;
+  // Session mana text
+  document.getElementById('streak').textContent = `MANA RECOLECTADO: ${S.mana}`;
 
   // Pips (up to 25)
   const pipsEl = document.getElementById('pips');
@@ -775,27 +726,16 @@ function refreshMana() {
   }
 }
 
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return `${r},${g},${b}`;
-}
-
 // ═══════════════════════════════════════════════════════════
 //  COMPLETION FLASH
 // ═══════════════════════════════════════════════════════════
-function showFlash(earned, bonus) {
+function showFlash(earned) {
   const col   = FLASH_COLORS[tier()];
   const layer = document.getElementById('flashLayer');
-  const bonusLine = bonus > 0
-    ? `<div style="font-size:7px;color:#FFCC44;text-shadow:0 0 8px #FFAA00;margin-top:4px">BONUS RACHA +${bonus}</div>`
-    : '';
   layer.innerHTML = `
     <div class="flash-msg" style="border-color:${col};color:${col};text-shadow:0 0 16px ${col}">
       +${earned} MANA
       <div style="font-size:8px;color:#44FF88;text-shadow:0 0 8px #44FF88">✦ COMPLETO ✦</div>
-      ${bonusLine}
     </div>`;
   layer.style.display = 'flex';
   setTimeout(() => { layer.style.display = 'none'; layer.innerHTML = ''; }, 2800);
@@ -810,12 +750,13 @@ function adjInterval(d) {
   S.remaining = S.interval * 60;
   S.total     = S.remaining;
   document.getElementById('ival').textContent = S.interval;
+  saveState();
   refreshTimer();
   refreshProgress();
 }
 
 // ═══════════════════════════════════════════════════════════
-//  VISIBILITY — catch up lost time when app returns
+//  VISIBILITY — catch up lost time
 // ═══════════════════════════════════════════════════════════
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
@@ -834,6 +775,8 @@ document.addEventListener('visibilitychange', () => {
 //  INIT
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('load', () => {
+  loadState();
+  document.getElementById('ival').textContent = S.interval;
   initStars();
   requestAnimationFrame(starsLoop);
   refreshTimer();
