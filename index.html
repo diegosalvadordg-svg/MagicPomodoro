@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#06091A">
-  <title>Mana Collector</title>
+  <title>Canalizador de Mana</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -83,7 +83,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding-top: max(16px, env(safe-area-inset-top, 16px));
+      padding-top: max(52px, env(safe-area-inset-top, 52px));
       padding-right: 22px;
       padding-left: 22px;
       padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
@@ -92,11 +92,12 @@
 
     /* ── TITLE ── */
     .title {
-      font-size: 9px;
+      font-size: 7px;
       color: #8899BB;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       text-align: center;
       text-shadow: 0 0 10px rgba(100,150,220,0.35);
+      line-height: 2;
     }
 
     /* ── TIMER ── */
@@ -234,9 +235,68 @@
       color: #88CCFF;
       border-color: #88CCFF;
       box-shadow: 0 0 10px rgba(136,204,255,0.22), inset 0 0 10px rgba(136,204,255,0.05);
-      width: 100%;
-      max-width: 350px;
+      width: 210px;
+      flex: none;
     }
+
+    /* ── INTRO MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4,7,22,0.94);
+      z-index: 950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      animation: modalIn 0.5s ease-out;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-box {
+      border: 2px solid rgba(68,255,204,0.35);
+      background: rgba(6,9,26,0.98);
+      padding: 30px 22px;
+      max-width: 300px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 0 48px rgba(68,255,204,0.07), inset 0 0 24px rgba(0,0,0,0.6);
+    }
+    .modal-title {
+      font-size: 7px;
+      color: #44FFCC;
+      letter-spacing: 2px;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(68,255,204,0.50);
+      margin-bottom: 18px;
+    }
+    .modal-text {
+      font-size: 6px;
+      color: #7799BB;
+      line-height: 2.4;
+      text-align: center;
+      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+    }
+    .btn-modal {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      color: #44FFCC;
+      border: 2px solid #44FFCC;
+      background: transparent;
+      padding: 12px 14px;
+      cursor: pointer;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 0 10px rgba(68,255,204,0.18), inset 0 0 10px rgba(68,255,204,0.04);
+      letter-spacing: 1px;
+      border-radius: 3px;
+    }
+    .btn-modal:active { transform: translateY(2px); opacity: .8; }
 
     /* ── INTERVAL ── */
     .interval-wrap {
@@ -311,7 +371,7 @@
 <!-- ══════════════  UI  ══════════════ -->
 <div class="ui">
 
-  <div class="title">✦ MANA COLLECTOR ✦</div>
+  <div class="title">✦ CANALIZADOR DE MANA ✦</div>
   <div class="g20"></div>
 
   <div class="timer" id="timer">25:00</div>
@@ -383,6 +443,18 @@
 </div>
 
 <div class="flash-layer" id="flashLayer"></div>
+
+<!-- ══════════════  INTRO MODAL  ══════════════ -->
+<div class="modal-overlay" id="introModal">
+  <div class="modal-box">
+    <div class="modal-title">Un gusto verte</div>
+    <div class="modal-text">
+      Utiliza el poder de tu concentración para canalizar y recolectar mana.<br><br>
+      Recuerda siempre sellar el mana recolectado al finalizar tu sesión.
+    </div>
+    <button class="btn-modal" onclick="closeIntroModal()">MI MENTE ESTÁ LISTA</button>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -549,6 +621,27 @@ function playWarningSound() {
       .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.25));
   } catch(e) {}
 }
+function playMysterySound() {
+  try {
+    const ctx = getAudio();
+    // Deep arcane drone + ascending ethereal tones
+    playNote(ctx, 110,  0.00, 1.4, 0.14, 'sine');     // low bass drone
+    playNote(ctx, 220,  0.15, 1.0, 0.09, 'sine');     // octave
+    playNote(ctx, 277,  0.35, 0.8, 0.07, 'triangle'); // minor third
+    playNote(ctx, 330,  0.55, 0.7, 0.07, 'triangle'); // fifth
+    playNote(ctx, 554,  0.75, 0.9, 0.10, 'sine');     // high ethereal
+    playNote(ctx, 440,  0.90, 0.6, 0.06, 'sine');     // resolve
+  } catch(e) {}
+}
+
+function closeIntroModal() {
+  playMysterySound();
+  const modal = document.getElementById('introModal');
+  modal.style.transition = 'opacity 0.6s ease';
+  modal.style.opacity = '0';
+  setTimeout(() => { modal.style.display = 'none'; }, 620);
+}
+
 function playSealSound() {
   try {
     const ctx = getAudio();
