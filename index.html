@@ -69,21 +69,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 0;
       cursor: pointer;
       background: transparent;
       border: none;
       font-family: 'Press Start 2P', monospace;
-      font-size: 5px;
+      font-size: 0;
       color: #3A5570;
-      letter-spacing: 1px;
+      letter-spacing: 0;
       padding: 0;
       transition: color .2s;
       -webkit-tap-highlight-color: transparent;
     }
     .nav-tab.active { color: #44FFCC; }
-    .nav-tab .nav-icon { font-size: 16px; line-height: 1; }
-    .nav-tab.active .nav-icon { filter: drop-shadow(0 0 6px rgba(68,255,204,0.7)); }
+    .nav-tab .nav-icon { font-size: 22px; line-height: 1; }
+    .nav-tab.active .nav-icon { filter: drop-shadow(0 0 8px rgba(68,255,204,0.85)); }
 
     /* ══════════════════════════════════════════
        SCREENS
@@ -325,9 +325,6 @@
     .habit-countdown.urgent   { color: #FF9944; text-shadow: 0 0 6px rgba(255,140,50,0.5); }
     .habit-countdown.critical { color: #FF4455; text-shadow: 0 0 8px rgba(255,50,70,0.6); }
 
-    .habit-bar-bg { width: 100%; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
-    .habit-bar-fill { height: 100%; background: #7755CC; border-radius: 2px; transition: width .8s linear, background .8s; }
-    .habit-card.done .habit-bar-fill { background: #44FF88; }
 
     .habit-btn-row { display: flex; gap: 8px; }
     .btn-complete {
@@ -338,7 +335,6 @@
     }
     .btn-complete:active { opacity: .7; }
     .btn-complete.done-state { border-color: rgba(68,255,136,0.40); color: #44FF88; background: rgba(68,255,136,0.06); }
-    .btn-complete:disabled { opacity: 0.5; cursor: default; }
 
     .btn-habit-seal {
       font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 9px;
@@ -366,6 +362,191 @@
     .g16 { height: 16px; flex-shrink: 0; }
     .g20 { height: 20px; flex-shrink: 0; }
     .g24 { height: 24px; flex-shrink: 0; }
+
+    /* ══════════════════════════════════════════
+       INCUBADORA — DARKNESS OVERLAY
+    ══════════════════════════════════════════ */
+    #incuDarkness {
+      position: fixed; inset: 0; z-index: 5;
+      background: #00010A;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.7s ease;
+    }
+    #incuDarkness.active { opacity: 1; }
+
+    /* ══════════════════════════════════════════
+       INCUBADORA — SCREEN
+    ══════════════════════════════════════════ */
+    .incubadora-ui {
+      min-height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding-top: max(52px, env(safe-area-inset-top, 52px));
+      padding-right: 22px; padding-left: 22px; padding-bottom: 24px;
+      gap: 0;
+    }
+    /* Title override +10% */
+    .incubadora-ui .title { font-size: 8px; }
+
+    .incu-hint {
+      font-size: 7px; color: #8877BB; letter-spacing: 1px; text-align: center;
+      line-height: 2.4; max-width: 300px;
+    }
+    .incu-hint span { color: #FFCC44; text-shadow: 0 0 8px rgba(255,200,60,0.5); }
+
+    .incu-count {
+      font-size: 7px; color: #446688; letter-spacing: 2px; text-align: center;
+    }
+    .incu-count span { color: #88BBDD; }
+
+    /* Free-floating star field */
+    .star-field {
+      position: relative;
+      width: 100%; max-width: 340px; height: 260px;
+      overflow: hidden;
+    }
+
+    /* Stars floating */
+    .jar-star {
+      position: absolute; pointer-events: none;
+      animation: jarFloat linear infinite, jarTwinkle ease-in-out infinite;
+    }
+    @keyframes jarFloat {
+      0%   { transform: translate(0px,0px) rotate(0deg); }
+      25%  { transform: translate(var(--fx1),var(--fy1)) rotate(15deg); }
+      50%  { transform: translate(var(--fx2),var(--fy2)) rotate(-10deg); }
+      75%  { transform: translate(var(--fx3),var(--fy3)) rotate(20deg); }
+      100% { transform: translate(0px,0px) rotate(0deg); }
+    }
+    @keyframes jarTwinkle {
+      0%,100% { opacity:.75; filter:drop-shadow(0 0 4px var(--sc)) drop-shadow(0 0 9px var(--sc)); }
+      50%     { opacity:1;   filter:drop-shadow(0 0 8px var(--sc)) drop-shadow(0 0 18px var(--sc)); }
+    }
+
+    .incu-mana-display {
+      font-size: 7px; color: #88CCFF; letter-spacing: 2px; text-align: center;
+      text-shadow: 0 0 8px rgba(136,200,255,0.4);
+    }
+    .incu-mana-display span { color: #CCEEFF; text-shadow: 0 0 10px rgba(180,230,255,0.7); }
+
+    .btn-create-star {
+      font-family: 'Press Start 2P', monospace; font-size: 9px;
+      padding: 14px 28px; background: transparent;
+      border: 2px solid #AADDFF; color: #AADDFF; cursor: pointer;
+      border-radius: 3px; letter-spacing: 1px;
+      box-shadow: 0 0 14px rgba(160,210,255,0.22), inset 0 0 10px rgba(160,210,255,0.05);
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity .1s, transform .05s;
+    }
+    .btn-create-star:active  { transform: translateY(2px); opacity: .8; }
+    .btn-create-star:disabled { opacity: 0.35; cursor: default; transform: none; }
+
+    .incu-msg {
+      font-size: 7px; letter-spacing: 1px; text-align: center;
+      min-height: 16px; transition: opacity .3s;
+    }
+    .incu-msg.error   { color: #FF5566; text-shadow: 0 0 8px rgba(255,80,100,0.5); }
+    .incu-msg.success { color: #AADDFF; text-shadow: 0 0 8px rgba(160,210,255,0.6); }
+
+    /* ══════════════════════════════════════════
+       MISIONES
+    ══════════════════════════════════════════ */
+    .misiones-ui {
+      min-height: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      padding-top: max(52px, env(safe-area-inset-top, 52px));
+      padding-right: 18px; padding-left: 18px; padding-bottom: 24px;
+      gap: 0;
+    }
+
+    .mis-header {
+      width: 100%; max-width: 350px;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .mis-sealed { font-size: 6px; color: #6655AA; letter-spacing: 2px; text-align: center; }
+    .mis-sealed span { color: #BBAAFF; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
+
+    .mis-section {
+      width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .mis-section-title {
+      font-size: 6px; letter-spacing: 2px; padding: 4px 0 2px;
+      border-bottom: 1px solid;
+    }
+    .mis-section-title.principal { color: #FFCC44; border-color: rgba(255,200,60,0.25); text-shadow: 0 0 8px rgba(255,200,60,0.4); }
+    .mis-section-title.secundaria { color: #88CCFF; border-color: rgba(136,200,255,0.25); text-shadow: 0 0 8px rgba(136,200,255,0.4); }
+    .mis-section-title.relleno   { color: #88FFAA; border-color: rgba(136,255,170,0.20); text-shadow: 0 0 8px rgba(136,255,170,0.35); }
+
+    .mis-card {
+      border: 1px solid rgba(180,150,255,0.18); background: rgba(8,5,20,0.80);
+      padding: 10px 12px; display: flex; align-items: center; gap: 8px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: background .12s, border-color .12s;
+    }
+    .mis-card:active { background: rgba(180,150,255,0.10); }
+    .mis-card-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+    .mis-name { font-size: 7px; color: #CCBBEE; letter-spacing: 1px; line-height: 1.7; }
+    .mis-when { font-size: 5px; letter-spacing: 1px; }
+    .mis-when.hoy    { color: #FFCC44; }
+    .mis-when.manana { color: #88CCFF; }
+
+    .mis-card-actions { display: flex; gap: 5px; flex-shrink: 0; }
+    .mis-act-btn {
+      font-family: 'Press Start 2P', monospace; font-size: 6px;
+      background: transparent; border: 1px solid; cursor: pointer; padding: 4px 7px;
+      border-radius: 2px; -webkit-tap-highlight-color: transparent; line-height: 1;
+    }
+    .mis-act-btn.edit { color: rgba(100,180,255,0.55); border-color: rgba(100,180,255,0.25); }
+    .mis-act-btn.edit:active { color: #88CCFF; border-color: #88CCFF; }
+    .mis-act-btn.del  { color: rgba(255,80,80,0.45); border-color: rgba(255,80,80,0.20); }
+    .mis-act-btn.del:active  { color: #FF5566; border-color: #FF5566; }
+
+    .btn-new-mission {
+      font-family: 'Press Start 2P', monospace; font-size: 7px; padding: 12px;
+      background: transparent; border: 2px solid #BBAAFF; color: #BBAAFF;
+      cursor: pointer; width: 100%; max-width: 350px; border-radius: 3px;
+      letter-spacing: 1px; box-shadow: 0 0 10px rgba(180,160,255,0.18);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-new-mission:active { transform: translateY(2px); opacity: .8; }
+
+    .btn-seal-mis {
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      padding: 12px; background: transparent;
+      border: 2px solid #88CCFF; color: #88CCFF;
+      cursor: pointer; width: 100%; max-width: 350px; border-radius: 3px;
+      letter-spacing: 1px; box-shadow: 0 0 10px rgba(136,204,255,0.18);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-seal-mis:active { transform: translateY(2px); opacity: .8; }
+
+    .mis-mana-pending { font-size: 7px; color: #44FF88; text-shadow: 0 0 6px rgba(68,255,136,0.50); text-align: center; letter-spacing: 1px; }
+    .mis-mana-pending span { color: #44FF88; text-shadow: 0 0 6px rgba(68,255,136,0.50); }
+
+    .cat-select-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .cat-btn {
+      font-family: 'Press Start 2P', monospace; font-size: 5px; padding: 7px 9px;
+      background: rgba(170,100,255,0.06); border: 1px solid rgba(170,100,255,0.28);
+      color: #8866CC; cursor: pointer; border-radius: 2px;
+      -webkit-tap-highlight-color: transparent; transition: all .1s;
+    }
+    .cat-btn.selected { background: rgba(170,100,255,0.20); border-color: #AA88FF; color: #CCAAFF; box-shadow: 0 0 8px rgba(170,136,255,0.25); }
+    .when-btn {
+      font-family: 'Press Start 2P', monospace; font-size: 5px; padding: 7px 9px;
+      background: rgba(170,100,255,0.06); border: 1px solid rgba(170,100,255,0.28);
+      color: #8866CC; cursor: pointer; border-radius: 2px;
+      -webkit-tap-highlight-color: transparent; transition: all .1s;
+    }
+    .when-btn.selected { background: rgba(170,100,255,0.20); border-color: #AA88FF; color: #CCAAFF; box-shadow: 0 0 8px rgba(170,136,255,0.25); }
+
+    /* ── Seal orbs ── */
+    .seal-orb {
+      position: fixed; width: 9px; height: 9px; border-radius: 50%;
+      background: #88CCFF;
+      box-shadow: 0 0 7px #88CCFF, 0 0 14px rgba(136,204,255,0.7);
+      z-index: 901; pointer-events: none;
+      transform: translate(-50%,-50%);
+      transition: left 0.55s cubic-bezier(0.3,0,0.2,1), top 0.55s cubic-bezier(0.3,0,0.2,1), opacity 0.25s 0.42s;
+    }
   </style>
 </head>
 <body>
@@ -375,6 +556,32 @@
   <canvas id="stars"></canvas>
   <div class="cloud cl1"></div><div class="cloud cl2"></div>
   <div class="cloud cl3"></div><div class="cloud cl4"></div>
+</div>
+<div id="incuDarkness"></div>
+
+<!-- ══════════════  MISIONES  ══════════════ -->
+<div class="screen" id="screenMisiones">
+  <div class="misiones-ui">
+
+    <div class="mis-header">
+      <div class="title" style="color:#BBAAFF;text-shadow:0 0 10px rgba(180,160,255,0.40);">✦ MISIONES ✦</div>
+      <div class="mis-sealed">MANA SELLADO: <span id="misionesSealedDisplay">0</span></div>
+    </div>
+    <div class="g12"></div>
+    <div class="mis-mana-pending">MANA RECOLECTADO: <span id="misManaDisplay">0</span></div>
+    <div class="g12"></div>
+    <div class="divider"></div>
+    <div class="g16"></div>
+
+    <div id="misionList" style="width:100%;max-width:350px;display:flex;flex-direction:column;gap:16px;"></div>
+
+    <div class="g16"></div>
+    <button class="btn-new-mission" onclick="openNewMissionModal()">+ CREAR MISIÓN</button>
+    <div class="g12"></div>
+    <button class="btn-seal-mis" id="btnSealMis" onclick="sealMisMana(this)">SELLAR MANA</button>
+    <div class="g24"></div>
+
+  </div>
 </div>
 
 <!-- ══════════════  CATALIZADOR  ══════════════ -->
@@ -430,7 +637,7 @@
       </div>
     </div>
     <div class="g20"></div>
-    <button class="btn btn-seal" onclick="sealMana()">SELLAR MANA</button>
+    <button class="btn btn-seal" id="btnSealCat" onclick="sealMana(this)">SELLAR MANA</button>
 
   </div>
 </div>
@@ -457,15 +664,43 @@
   </div>
 </div>
 
+<!-- ══════════════  INCUBADORA  ══════════════ -->
+<div class="screen" id="screenIncubadora">
+  <div class="incubadora-ui">
+
+    <div class="title" style="color:#AADDFF;text-shadow:0 0 10px rgba(160,210,255,0.40);">✦ INCUBADORA ✦</div>
+    <div class="g12"></div>
+    <div class="incu-hint">Utiliza <span>10 de mana</span> para hacer nacer una nueva estrella.</div>
+    <div class="g8"></div>
+    <div class="incu-count">ESTRELLAS CREADAS: <span id="starCount">0</span></div>
+    <div class="g16"></div>
+
+    <!-- Star field — stars float freely here -->
+    <div class="star-field" id="starField"></div>
+
+    <div class="g20"></div>
+    <div class="incu-mana-display">MANA SELLADO: <span id="incuSealedDisplay">0</span></div>
+    <div class="g12"></div>
+    <button class="btn-create-star" id="btnCreateStar" onclick="createStar()">CREAR ESTRELLA</button>
+    <div class="g12"></div>
+    <div class="incu-msg" id="incuMsg"></div>
+
+  </div>
+</div>
+
 <!-- ══════════════  BOTTOM NAV  ══════════════ -->
 <div class="bottom-nav">
+  <button class="nav-tab" id="tabMisiones" onclick="switchTab('Misiones')">
+    <span class="nav-icon">⊕</span>
+  </button>
   <button class="nav-tab active" id="tabCatalizador" onclick="switchTab('Catalizador')">
     <span class="nav-icon">◈</span>
-    CATALIZADOR
   </button>
   <button class="nav-tab" id="tabClarividente" onclick="switchTab('Clarividente')">
     <span class="nav-icon">⟡</span>
-    CLARIVIDENTE
+  </button>
+  <button class="nav-tab" id="tabIncubadora" onclick="switchTab('Incubadora')">
+    <span class="nav-icon">✺</span>
   </button>
 </div>
 
@@ -495,6 +730,9 @@
         <button class="freq-btn"          data-hours="6"  onclick="selectFreq(this)">6H</button>
         <button class="freq-btn"          data-hours="12" onclick="selectFreq(this)">12H</button>
         <button class="freq-btn"          data-hours="24" onclick="selectFreq(this)">24H</button>
+        <button class="freq-btn"          data-hours="48" onclick="selectFreq(this)">48H</button>
+        <button class="freq-btn"          data-hours="72" onclick="selectFreq(this)">72H</button>
+        <button class="freq-btn"          data-hours="0"  onclick="selectFreq(this)">SIN TIEMPO</button>
       </div>
       <button class="btn-purple" onclick="addHabit()">+ CREAR HÁBITO</button>
       <button class="modal-cancel" onclick="closeNewHabitModal()">CANCELAR</button>
@@ -529,10 +767,72 @@
         <button class="freq-btn" data-hours="6"  onclick="selectEditFreq(this)">6H</button>
         <button class="freq-btn" data-hours="12" onclick="selectEditFreq(this)">12H</button>
         <button class="freq-btn" data-hours="24" onclick="selectEditFreq(this)">24H</button>
+        <button class="freq-btn" data-hours="48" onclick="selectEditFreq(this)">48H</button>
+        <button class="freq-btn" data-hours="72" onclick="selectEditFreq(this)">72H</button>
+        <button class="freq-btn" data-hours="0"  onclick="selectEditFreq(this)">SIN TIEMPO</button>
       </div>
       <button class="btn-purple" onclick="saveEditHabit()">GUARDAR</button>
       <button class="modal-cancel" onclick="closeEditHabitModal()">CANCELAR</button>
     </div>
+  </div>
+</div>
+
+<!-- ══════════════  NEW MISSION MODAL  ══════════════ -->
+<div class="modal-overlay hidden" id="newMissionModal">
+  <div class="modal-box purple">
+    <div class="modal-title purple">NUEVA MISIÓN</div>
+    <div class="habit-form-modal">
+      <input class="habit-input" id="missionNameInput" type="text" placeholder="NOMBRE DE LA MISIÓN" maxlength="32" autocomplete="off" spellcheck="false">
+      <div class="freq-label">CATEGORÍA</div>
+      <div class="cat-select-row" id="catRow">
+        <button class="cat-btn selected" data-cat="principal"  onclick="selectCat(this)">PRINCIPAL</button>
+        <button class="cat-btn"          data-cat="secundaria" onclick="selectCat(this)">SECUNDARIA</button>
+        <button class="cat-btn"          data-cat="relleno"    onclick="selectCat(this)">RELLENO</button>
+      </div>
+      <div class="freq-label">CUÁNDO</div>
+      <div class="cat-select-row" id="whenRow">
+        <button class="when-btn selected" data-when="hoy"       onclick="selectWhen(this)">HOY</button>
+        <button class="when-btn"          data-when="manana"    onclick="selectWhen(this)">MAÑANA</button>
+        <button class="when-btn"          data-when="sin_fecha" onclick="selectWhen(this)">SIN FECHA</button>
+      </div>
+      <button class="btn-purple" onclick="addMission()">+ CREAR MISIÓN</button>
+      <button class="modal-cancel" onclick="closeNewMissionModal()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════  EDIT MISSION MODAL  ══════════════ -->
+<div class="modal-overlay hidden" id="editMissionModal">
+  <div class="modal-box purple">
+    <div class="modal-title purple">EDITAR MISIÓN</div>
+    <div class="habit-form-modal">
+      <input class="habit-input" id="editMissionNameInput" type="text" maxlength="32" autocomplete="off" spellcheck="false">
+      <div class="freq-label">CATEGORÍA</div>
+      <div class="cat-select-row" id="editCatRow">
+        <button class="cat-btn" data-cat="principal"  onclick="selectEditCat(this)">PRINCIPAL</button>
+        <button class="cat-btn" data-cat="secundaria" onclick="selectEditCat(this)">SECUNDARIA</button>
+        <button class="cat-btn" data-cat="relleno"    onclick="selectEditCat(this)">RELLENO</button>
+      </div>
+      <div class="freq-label">CUÁNDO</div>
+      <div class="cat-select-row" id="editWhenRow">
+        <button class="when-btn" data-when="hoy"       onclick="selectEditWhen(this)">HOY</button>
+        <button class="when-btn" data-when="manana"    onclick="selectEditWhen(this)">MAÑANA</button>
+        <button class="when-btn" data-when="sin_fecha" onclick="selectEditWhen(this)">SIN FECHA</button>
+      </div>
+      <button class="btn-purple" onclick="saveEditMission()">GUARDAR</button>
+      <button class="modal-cancel" onclick="closeEditMissionModal()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════  DELETE MISSION MODAL  ══════════════ -->
+<div class="modal-overlay hidden" id="deleteMissionModal">
+  <div class="modal-box" style="border-color:rgba(255,80,80,0.35);box-shadow:0 0 48px rgba(255,80,80,0.07),inset 0 0 24px rgba(0,0,0,0.6);">
+    <div class="modal-title" style="color:#FF6677;text-shadow:0 0 10px rgba(255,80,100,0.50);">¿ELIMINAR MISIÓN?</div>
+    <div class="modal-text">Esta acción eliminará la misión permanentemente.</div>
+    <button class="btn-modal" style="color:#FF6677;border-color:#FF6677;box-shadow:0 0 10px rgba(255,80,100,0.18);" onclick="confirmDeleteMission()">SÍ, ELIMINAR</button>
+    <div class="g8"></div>
+    <button class="modal-cancel" onclick="closeDeleteMissionModal()">CANCELAR</button>
   </div>
 </div>
 
@@ -545,6 +845,10 @@ function switchTab(name) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('screen' + name).classList.add('active');
   document.getElementById('tab' + name).classList.add('active');
+  const dark = document.getElementById('incuDarkness');
+  if (name === 'Incubadora') { dark.classList.add('active'); setTimeout(renderAllJarStars, 80); }
+  else dark.classList.remove('active');
+  if (name === 'Misiones') renderMissions();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -577,15 +881,16 @@ function loadState() {
   } catch(e) {}
 }
 
-function sealMana() {
+function sealMana(btnEl) {
   if (S.mana === 0) return;
-  S.sealedMana += S.mana;
+  const amount = S.mana;
+  S.sealedMana += amount;
   S.mana = 0;
   saveState();
   playSealSound();
   refreshMana();
   refreshProgress();
-  refreshClariSealed();
+  if (btnEl) animateSealOrbs(btnEl, amount);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -666,10 +971,11 @@ function addHabit() {
 
 function completeHabit(id) {
   const h = habits.find(x => x.id === id);
-  if (!h || h.done) return;
+  if (!h) return;
   const now = Date.now();
   h.done = true; h.completedAt = now;
-  h.deadlineAt = now + h.hours*3600*1000;
+  // Reinicia el countdown solo si tiene frecuencia definida
+  if (h.hours > 0) h.deadlineAt = now + h.hours * 3600 * 1000;
   h.streak++;
   const mana = habitManaRate(h.streak);
   h.pendingMana = (h.pendingMana || 0) + mana;
@@ -693,19 +999,17 @@ function sealHabitMana(id) {
   showSealFlash(h.pendingMana || 0); // already 0 — show from local calc above handled inside
 }
 
-function sealHabitManaById(id) {
+function sealHabitManaById(id, btnEl) {
   const h = habits.find(x => x.id === id);
   if (!h || !h.pendingMana) return;
   const amount = h.pendingMana;
   S.sealedMana += amount;
   h.pendingMana = 0;
-  saveState();
-  saveHabits();
-  refreshMana();
-  refreshClariSealed();
-  renderHabits();
+  saveState(); saveHabits();
+  refreshMana(); renderHabits();
   playSealSound();
   showSealFlashAmount(amount);
+  if (btnEl) animateSealOrbs(btnEl, amount);
 }
 
 let deletingHabitId = null;
@@ -730,21 +1034,23 @@ function tickHabits() {
   const now = Date.now();
   let changed = false;
   habits.forEach(h => {
+    if (h.hours === 0) return; // Sin tiempo — nunca expira
     if (!h.done && now >= h.deadlineAt) {
       if (h.streak > 0) { h.streak = 0; changed = true; }
       h.deadlineAt = now + h.hours*3600*1000;
       changed = true;
     }
-    if (h.done && now >= h.deadlineAt) { h.done = false; changed = true; }
   });
   if (changed) saveHabits();
   renderHabits();
 }
 
-function refreshClariSealed() {
-  const el = document.getElementById('clariSealedDisplay');
-  if (el) el.textContent = S.sealedMana;
+function refreshAllSealedDisplays() {
+  ['sealedManaDisplay','clariSealedDisplay','incuSealedDisplay','misionesSealedDisplay']
+    .forEach(id => { const el=document.getElementById(id); if(el) el.textContent=S.sealedMana; });
 }
+// Keep legacy name for compatibility
+function refreshClariSealed() { refreshAllSealedDisplays(); }
 
 function renderHabits() {
   const list = document.getElementById('habitList');
@@ -760,31 +1066,22 @@ function renderHabits() {
   habits.forEach(h => {
     const remaining = Math.max(0, h.deadlineAt - now);
     const totalMs   = h.hours * 3600 * 1000;
-    const pct       = h.done ? 100 : Math.round((1 - remaining / totalMs) * 100);
-    const hrs       = Math.floor(remaining / 3600000);
-    const mins      = Math.floor((remaining % 3600000) / 60000);
-    const secs      = Math.floor((remaining % 60000) / 1000);
-    const timeStr   = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     const manaRate  = habitManaRate(h.streak);
-    const pctLeft   = remaining / totalMs;
-    const isUrgent   = !h.done && pctLeft < 0.25 && pctLeft > 0;
-    const isCritical = !h.done && pctLeft < 0.10 && pctLeft > 0;
-    const pending    = h.pendingMana || 0;
-
-    let cardClass = 'habit-card';
-    if (h.done) cardClass += ' done';
-
-    let cdClass = 'habit-countdown';
-    if (isCritical) cdClass += ' critical';
-    else if (isUrgent) cdClass += ' urgent';
-
-    const btnLabel = h.done ? '✦ COMPLETADO' : 'MARCAR COMPLETO';
-    const btnClass = 'btn-complete' + (h.done ? ' done-state' : '');
+    const pending   = h.pendingMana || 0;
     const manaStars = '◆'.repeat(manaRate);
     const sealDisabled = pending === 0 ? 'disabled' : '';
 
+    let countdownHtml = '';
+    if (h.hours > 0) {
+      const hrs     = Math.floor(remaining / 3600000);
+      const mins    = Math.floor((remaining % 3600000) / 60000);
+      const secs    = Math.floor((remaining % 60000) / 1000);
+      const timeStr = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      countdownHtml = `<div class="habit-countdown">PRÓXIMO CICLO: ${timeStr}</div>`;
+    }
+
     const card = document.createElement('div');
-    card.className = cardClass;
+    card.className = 'habit-card';
     card.innerHTML = `
       <div class="habit-top">
         <div class="habit-name">${h.name}</div>
@@ -797,11 +1094,10 @@ function renderHabits() {
         <div class="habit-streak">RACHA: <span class="streak-val">${h.streak}</span></div>
         <div class="habit-mana-rate">${manaStars} ${manaRate} MANA</div>
       </div>
-      <div class="habit-bar-bg"><div class="habit-bar-fill" style="width:${pct}%"></div></div>
-      <div class="${cdClass}">${h.done ? 'PRÓXIMO CICLO: ' + timeStr : timeStr}</div>
+      ${countdownHtml}
       <div class="habit-btn-row">
-        <button class="${btnClass}" onclick="completeHabit(${h.id})" ${h.done ? 'disabled' : ''}>${btnLabel}</button>
-        <button class="btn-habit-seal" onclick="sealHabitManaById(${h.id})" ${sealDisabled}>
+        <button class="btn-complete" onclick="completeHabit(${h.id})">MARCAR COMPLETO</button>
+        <button class="btn-habit-seal" onclick="sealHabitManaById(${h.id},this)" ${sealDisabled}>
           ${pending > 0 ? `SELLAR +${pending}` : 'SELLAR MANA'}
         </button>
       </div>
@@ -978,6 +1274,8 @@ function refreshMana() {
   }
   if (S.mana>25) { const ex=document.createElement('div'); ex.className='pip-extra'; ex.textContent=`+${S.mana-25}`; pipsEl.appendChild(ex); }
   refreshClariSealed();
+  const incuEl = document.getElementById('incuSealedDisplay');
+  if (incuEl) incuEl.textContent = S.sealedMana;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -997,6 +1295,44 @@ function showSealFlashAmount(amount) {
   const layer=document.getElementById('flashLayer');
   layer.innerHTML=`<div class="flash-msg" style="border-color:#88CCFF;color:#88CCFF;text-shadow:0 0 16px #88CCFF">+${amount} SELLADO<div style="font-size:8px;color:#44FFCC;text-shadow:0 0 8px #44FFCC">✦ MANA CRISTALIZADO ✦</div></div>`;
   layer.style.display='flex'; setTimeout(()=>{ layer.style.display='none'; layer.innerHTML=''; }, 2800);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SEAL ORB ANIMATION
+// ═══════════════════════════════════════════════════════════
+function getActiveSealedTarget() {
+  const map = { screenCatalizador:'sealedManaDisplay', screenClarividente:'clariSealedDisplay',
+                screenIncubadora:'incuSealedDisplay', screenMisiones:'misionesSealedDisplay' };
+  const active = document.querySelector('.screen.active');
+  return active ? document.getElementById(map[active.id]) : null;
+}
+
+function animateSealOrbs(fromEl, amount) {
+  const toEl = getActiveSealedTarget();
+  if (!fromEl || !toEl) return;
+  const orbCount = Math.min(3, Math.max(1, amount <= 2 ? 1 : amount <= 6 ? 2 : 3));
+  const fromR = fromEl.getBoundingClientRect();
+  const toR   = toEl.getBoundingClientRect();
+  const sx = fromR.left + fromR.width/2;
+  const sy = fromR.top  + fromR.height/2;
+  const ex = toR.left   + toR.width/2;
+  const ey = toR.top    + toR.height/2;
+
+  for (let i = 0; i < orbCount; i++) {
+    setTimeout(() => {
+      const orb = document.createElement('div');
+      orb.className = 'seal-orb';
+      orb.style.left = sx + 'px';
+      orb.style.top  = sy + 'px';
+      document.body.appendChild(orb);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        orb.style.left    = ex + 'px';
+        orb.style.top     = ey + 'px';
+        orb.style.opacity = '0';
+      }));
+      setTimeout(() => orb.remove(), 800);
+    }, i * 140);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1026,14 +1362,459 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // ═══════════════════════════════════════════════════════════
+//  INCUBADORA
+// ═══════════════════════════════════════════════════════════
+let jarStars      = [];
+let incuAnimating = false;
+
+const STAR_COLORS = ['#E8F8FF','#AADDFF','#FFEEAA','#FFD700','#CCFFEE','#FFB8FF','#FFCCEE'];
+
+function saveJarStars() { try { localStorage.setItem('jar_stars', JSON.stringify(jarStars)); } catch(e) {} }
+function loadJarStars()  { try { const d=JSON.parse(localStorage.getItem('jar_stars')||'[]'); if(Array.isArray(d)) jarStars=d; } catch(e) {} }
+
+// ── Charge-up sound (plays when button pressed) ──────────
+function playChargeSound() {
+  try {
+    const ctx = getAudio(); const now = ctx.currentTime;
+    // Rising sawtooth — power charging up
+    const o1=ctx.createOscillator(), g1=ctx.createGain();
+    o1.connect(g1); g1.connect(ctx.destination); o1.type='sawtooth';
+    o1.frequency.setValueAtTime(55, now); o1.frequency.exponentialRampToValueAtTime(380, now+1.1);
+    g1.gain.setValueAtTime(0,now); g1.gain.linearRampToValueAtTime(0.13,now+0.2);
+    g1.gain.linearRampToValueAtTime(0.18,now+0.9); g1.gain.linearRampToValueAtTime(0,now+1.2);
+    o1.start(now); o1.stop(now+1.2);
+    // Harmonic triangle
+    const o2=ctx.createOscillator(), g2=ctx.createGain();
+    o2.connect(g2); g2.connect(ctx.destination); o2.type='triangle';
+    o2.frequency.setValueAtTime(110, now); o2.frequency.exponentialRampToValueAtTime(760, now+1.0);
+    g2.gain.setValueAtTime(0,now); g2.gain.linearRampToValueAtTime(0.07,now+0.25);
+    g2.gain.linearRampToValueAtTime(0,now+1.05);
+    o2.start(now); o2.stop(now+1.05);
+    // Electric buzz
+    const o3=ctx.createOscillator(), g3=ctx.createGain();
+    o3.connect(g3); g3.connect(ctx.destination); o3.type='square';
+    o3.frequency.setValueAtTime(90,now+0.45); o3.frequency.exponentialRampToValueAtTime(220,now+1.0);
+    g3.gain.setValueAtTime(0,now); g3.gain.setValueAtTime(0,now+0.45);
+    g3.gain.linearRampToValueAtTime(0.04,now+0.65); g3.gain.linearRampToValueAtTime(0,now+1.0);
+    o3.start(now); o3.stop(now+1.0);
+  } catch(e) {}
+}
+
+// ── Mystic star-birth sound ───────────────────────────────
+function playStarBornSound() {
+  try {
+    const ctx = getAudio();
+    [[523,0.00,0.14,'sine'],[659,0.14,0.14,'sine'],[784,0.28,0.14,'sine'],
+     [1047,0.42,0.20,'sine'],[1319,0.60,0.28,'sine'],[1568,0.82,0.40,'sine'],
+     [2093,1.05,0.55,'triangle']].forEach(([f,t,d,w])=>playNote(ctx,f,t,d,0.18,w));
+    [[1760,0.10,0.60,'triangle'],[2349,0.35,0.50,'triangle']]
+      .forEach(([f,t,d,w])=>playNote(ctx,f,t,d,0.06,w));
+  } catch(e) {}
+}
+
+// ── Star merge sound ──────────────────────────────────────
+function playStarMergeSound() {
+  try {
+    const ctx = getAudio();
+    playNote(ctx,110,0.0,0.8,0.22,'sine'); playNote(ctx,220,0.1,0.6,0.15,'sine');
+    playNote(ctx,440,0.2,0.5,0.12,'triangle'); playNote(ctx,880,0.3,0.6,0.14,'triangle');
+    playNote(ctx,1760,0.5,0.8,0.10,'sine'); playNote(ctx,2637,0.7,0.5,0.08,'triangle');
+    playNote(ctx,3520,0.9,0.6,0.06,'sine');
+  } catch(e) {}
+}
+
+// ── Create star entry point ───────────────────────────────
+function createStar() {
+  if (incuAnimating) return;
+  if (S.sealedMana < 10) { showIncuMsg('MANA INSUFICIENTE', 'error'); return; }
+  incuAnimating = true;
+  document.getElementById('btnCreateStar').disabled = true;
+  S.sealedMana -= 10;
+  saveState(); refreshMana();
+  playChargeSound(); // charge-up plays immediately
+
+  runSealAnimation(() => {
+    const star = spawnStar();
+    jarStars.push(star);
+    saveJarStars();
+    document.getElementById('starCount').textContent = jarStars.length;
+    playStarBornSound();
+    showIncuMsg('✦ NUEVA ESTRELLA CREADA ✦', 'success');
+    incuAnimating = false;
+    document.getElementById('btnCreateStar').disabled = false;
+    // Every 5 stars → merge animation
+    if (jarStars.length > 0 && jarStars.length % 5 === 0) {
+      setTimeout(() => triggerStarCombine(), 600);
+    }
+  });
+}
+
+// ── Spawn star in free field ──────────────────────────────
+function spawnStar() {
+  const field = document.getElementById('starField');
+  const fw    = field.offsetWidth  || 340;
+  const fh    = field.offsetHeight || 260;
+  const size  = 12 + Math.random() * 16;
+  const color = STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)];
+  const pad   = size + 12;
+  const cx    = pad + Math.random() * (fw - pad*2);
+  const cy    = pad + Math.random() * (fh - pad*2);
+  const rnd   = () => (Math.random()*24 - 12).toFixed(1) + 'px';
+  const dur   = (5 + Math.random() * 6).toFixed(1) + 's';
+  const twDur = (2 + Math.random() * 4).toFixed(1) + 's';
+  const delay = (Math.random() * 5).toFixed(1) + 's';
+  const config = { cx, cy, size, color, fx1:rnd(), fy1:rnd(), fx2:rnd(), fy2:rnd(), fx3:rnd(), fy3:rnd(), dur, twDur, delay };
+  renderJarStar(config, field);
+  return config;
+}
+
+function renderJarStar(cfg, container) {
+  const field = container || document.getElementById('starField');
+  if (!field) return;
+  const svg  = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  const half = cfg.size / 2;
+  svg.setAttribute('width', cfg.size); svg.setAttribute('height', cfg.size);
+  svg.setAttribute('viewBox',`0 0 ${cfg.size} ${cfg.size}`);
+  svg.classList.add('jar-star');
+  const s=cfg.size, h=s/2, t=s*0.19;
+  // 4-pointed star
+  const path=`M${h},0 L${h+t},${h-t} L${s},${h} L${h+t},${h+t} L${h},${s} L${h-t},${h+t} L0,${h} L${h-t},${h-t} Z`;
+  svg.innerHTML=`<path d="${path}" fill="${cfg.color}" opacity="0.95"/>`;
+  svg.style.left=(cfg.cx-half)+'px'; svg.style.top=(cfg.cy-half)+'px';
+  svg.style.setProperty('--sc',cfg.color);
+  svg.style.setProperty('--fx1',cfg.fx1); svg.style.setProperty('--fy1',cfg.fy1);
+  svg.style.setProperty('--fx2',cfg.fx2); svg.style.setProperty('--fy2',cfg.fy2);
+  svg.style.setProperty('--fx3',cfg.fx3); svg.style.setProperty('--fy3',cfg.fy3);
+  svg.style.animationDuration=`${cfg.dur}, ${cfg.twDur}`;
+  svg.style.animationDelay=`${cfg.delay}, ${cfg.delay}`;
+  field.appendChild(svg);
+}
+
+function renderAllJarStars() {
+  const field = document.getElementById('starField');
+  if (!field) return;
+  field.innerHTML = '';
+  jarStars.forEach(cfg => renderJarStar(cfg, field));
+  document.getElementById('starCount').textContent = jarStars.length;
+}
+
+// ── Magic seal animation ──────────────────────────────────
+function runSealAnimation(onDone) {
+  const W = 260, H = 260, cx = 130, cy = 130;
+
+  // SVG helper
+  function mk(tag, attrs) {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
+    return e;
+  }
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width',W); svg.setAttribute('height',H);
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);z-index:850;pointer-events:none;opacity:0;transition:opacity 0.18s, transform 0.25s, filter 0.3s;`;
+
+  const R1=118, R2=88, R3=54, R4=28;
+  const C1='rgba(200,228,255,0.90)', C2='rgba(170,210,255,0.65)', C3='rgba(140,190,255,0.45)';
+
+  // Group layers — appear in sequence
+  const g1=mk('g',{}), g2=mk('g',{}), g3=mk('g',{}), g4=mk('g',{}), g5=mk('g',{});
+  [g1,g2,g3,g4,g5].forEach(g=>{ g.style.opacity='0'; g.style.transition='opacity 0.22s'; svg.appendChild(g); });
+
+  // G1 — outer circle
+  g1.appendChild(mk('circle',{cx,cy,r:R1,fill:'none',stroke:C1,'stroke-width':'2'}));
+  // Outer tick marks at every 30°
+  for(let i=0;i<12;i++){
+    const a=(i*30)*Math.PI/180, len=i%3===0?10:5;
+    g1.appendChild(mk('line',{x1:cx+Math.cos(a)*(R1-len),y1:cy+Math.sin(a)*(R1-len),x2:cx+Math.cos(a)*R1,y2:cy+Math.sin(a)*R1,stroke:C2,'stroke-width':'1.5'}));
+  }
+
+  // G2 — diamond (rotated square)
+  g2.appendChild(mk('path',{d:`M${cx},${cy-R2} L${cx+R2},${cy} L${cx},${cy+R2} L${cx-R2},${cy} Z`,fill:'none',stroke:C1,'stroke-width':'1.8'}));
+  // Small circles at diamond corners
+  [[cx,cy-R2],[cx+R2,cy],[cx,cy+R2],[cx-R2,cy]].forEach(([px,py])=>
+    g2.appendChild(mk('circle',{cx:px,cy:py,r:4,fill:'none',stroke:C1,'stroke-width':'1.5'}))
+  );
+
+  // G3 — middle circle + 8 radial lines
+  g3.appendChild(mk('circle',{cx,cy,r:R2,fill:'none',stroke:C2,'stroke-width':'1'}));
+  for(let i=0;i<8;i++){
+    const a=(i*45)*Math.PI/180;
+    g3.appendChild(mk('line',{x1:cx+Math.cos(a)*R3,y1:cy+Math.sin(a)*R3,x2:cx+Math.cos(a)*R2,y2:cy+Math.sin(a)*R2,stroke:C2,'stroke-width':'1'}));
+  }
+  // Diagonal lines inside diamond (like a square rotated 45°)
+  g3.appendChild(mk('path',{d:`M${cx-R3*.7},${cy-R3*.7} L${cx+R3*.7},${cy+R3*.7}`,stroke:C3,'stroke-width':'1',fill:'none'}));
+  g3.appendChild(mk('path',{d:`M${cx+R3*.7},${cy-R3*.7} L${cx-R3*.7},${cy+R3*.7}`,stroke:C3,'stroke-width':'1',fill:'none'}));
+  g3.appendChild(mk('line',{x1:cx-R2,y1:cy,x2:cx+R2,y2:cy,stroke:C3,'stroke-width':'0.8'}));
+  g3.appendChild(mk('line',{x1:cx,y1:cy-R2,x2:cx,y2:cy+R2,stroke:C3,'stroke-width':'0.8'}));
+
+  // G4 — inner circle + inner diamond
+  g4.appendChild(mk('circle',{cx,cy,r:R3,fill:'none',stroke:C2,'stroke-width':'1.2'}));
+  g4.appendChild(mk('path',{d:`M${cx},${cy-R4*1.5} L${cx+R4*1.5},${cy} L${cx},${cy+R4*1.5} L${cx-R4*1.5},${cy} Z`,fill:'none',stroke:C3,'stroke-width':'1'}));
+  // 4 small arcs at 45° positions on R2
+  for(let i=0;i<4;i++){
+    const a=((i*90)+45)*Math.PI/180;
+    g4.appendChild(mk('circle',{cx:cx+Math.cos(a)*R2,cy:cy+Math.sin(a)*R2,r:5,fill:'none',stroke:C2,'stroke-width':'1.2'}));
+  }
+
+  // G5 — center circle + center dot
+  g5.appendChild(mk('circle',{cx,cy,r:R4,fill:'rgba(160,210,255,0.06)',stroke:C1,'stroke-width':'1.5'}));
+  g5.appendChild(mk('circle',{cx,cy,r:5, fill:C1}));
+
+  document.body.appendChild(svg);
+
+  // ─── Phase timeline ───────────────────────────────────
+  // t=0   : appear + scale to 1
+  setTimeout(()=>{ svg.style.opacity='1'; svg.style.transform='translate(-50%,-50%) scale(1)'; }, 20);
+  // t=80  : G1 outer ring
+  setTimeout(()=>{ g1.style.opacity='1'; }, 80);
+  // t=230 : G2 diamond
+  setTimeout(()=>{ g2.style.opacity='1'; }, 230);
+  // t=380 : G3 radials + lines
+  setTimeout(()=>{ g3.style.opacity='1'; }, 380);
+  // t=530 : G4 inner
+  setTimeout(()=>{ g4.style.opacity='1'; }, 530);
+  // t=660 : G5 center
+  setTimeout(()=>{ g5.style.opacity='1'; }, 660);
+  // t=820 : GLOW peak
+  setTimeout(()=>{
+    svg.style.filter='drop-shadow(0 0 18px rgba(180,225,255,1)) drop-shadow(0 0 40px rgba(140,200,255,0.8)) drop-shadow(0 0 70px rgba(100,170,255,0.5))';
+    svg.style.transition='filter 0.35s, opacity 0.2s, transform 0.25s';
+  }, 820);
+  // t=1180 : Full screen flash — star appears AT PEAK (while screen is white)
+  setTimeout(()=>{
+    doFullScreenFlash(
+      () => { svg.style.opacity='0'; svg.remove(); onDone(); }, // onPeak → star spawns here
+      null                                                       // nothing extra on fade-out
+    );
+  }, 1180);
+}
+
+// ── Full-screen flash ─────────────────────────────────────
+function doFullScreenFlash(onPeak, onFaded) {
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;inset:0;z-index:900;background:rgba(220,240,255,0);pointer-events:none;transition:background 0.07s';
+  document.body.appendChild(flash);
+  requestAnimationFrame(()=>{
+    flash.style.background = 'rgba(220,240,255,0.96)';
+    setTimeout(()=>{
+      if (onPeak) onPeak(); // ← star spawns here, under the white flash
+      flash.style.transition = 'background 0.5s';
+      flash.style.background = 'rgba(220,240,255,0)';
+      setTimeout(()=>{ flash.remove(); if(onFaded) onFaded(); }, 520);
+    }, 70);
+  });
+}
+
+// ── Combine 5 stars → 1 big star ─────────────────────────
+function triggerStarCombine() {
+  const field = document.getElementById('starField');
+  if (!field) return;
+  const fw = field.offsetWidth || 340, fh = field.offsetHeight || 260;
+  const cx = fw/2, cy = fh/2;
+  // Take the last 5 config entries and their DOM elements
+  const mergeConfigs = jarStars.splice(jarStars.length - 5, 5);
+  const allEls = Array.from(field.querySelectorAll('.jar-star'));
+  const mergeEls = allEls.slice(-5);
+
+  mergeEls.forEach((el) => {
+    const halfW = el.offsetWidth/2 || 8;
+    const halfH = el.offsetHeight/2 || 8;
+    el.style.animation = 'none';
+    el.style.transition = 'left 0.55s ease-in, top 0.55s ease-in, opacity 0.4s ease-in';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.style.left    = (cx - halfW) + 'px';
+      el.style.top     = (cy - halfH) + 'px';
+      el.style.opacity = '0.15';
+    }));
+  });
+
+  setTimeout(() => {
+    mergeEls.forEach(el => el.remove());
+    // Golden flash
+    const burst = document.createElement('div');
+    burst.style.cssText = 'position:fixed;inset:0;z-index:900;background:rgba(255,220,60,0);pointer-events:none;transition:background 0.07s';
+    document.body.appendChild(burst);
+    requestAnimationFrame(() => {
+      burst.style.background = 'rgba(255,220,60,0.55)';
+      setTimeout(() => {
+        burst.style.transition = 'background 0.55s';
+        burst.style.background = 'rgba(255,220,60,0)';
+        setTimeout(() => burst.remove(), 580);
+      }, 75);
+    });
+
+    // Spawn 1 big golden star at center
+    const bigSize = 38 + Math.random() * 8;
+    const rnd = (r) => (Math.random()*r*2-r).toFixed(1)+'px';
+    const bigCfg = {
+      cx, cy, size: bigSize, color: '#FFD700',
+      fx1:rnd(16), fy1:rnd(12), fx2:rnd(14), fy2:rnd(18),
+      fx3:rnd(12), fy3:rnd(14),
+      dur: (7+Math.random()*4).toFixed(1)+'s',
+      twDur: (2+Math.random()*2).toFixed(1)+'s',
+      delay: '0s'
+    };
+    jarStars.push(bigCfg);
+    saveJarStars();
+    renderJarStar(bigCfg, field);
+    document.getElementById('starCount').textContent = jarStars.length;
+    playStarMergeSound();
+    showIncuMsg('✦ ESTRELLAS FUSIONADAS ✦', 'success');
+  }, 620);
+}
+
+function showIncuMsg(text, type) {
+  const el = document.getElementById('incuMsg');
+  el.textContent = text; el.className = 'incu-msg ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.textContent=''; el.className='incu-msg'; }, 2800);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MISIONES
+// ═══════════════════════════════════════════════════════════
+let missions = [];
+let misMana  = 0;
+let selectedMisCat   = 'principal';
+let selectedMisWhen  = 'hoy';
+let editingMissionId  = null;
+let deletingMissionId = null;
+let selectedEditMisCat  = 'principal';
+let selectedEditMisWhen = 'hoy';
+
+const CAT_LABELS  = { principal:'MISIÓN PRINCIPAL', secundaria:'MISIÓN SECUNDARIA', relleno:'RELLENO' };
+const WHEN_LABELS = { hoy:'HOY', manana:'MAÑANA', sin_fecha:'' };
+const CAT_ORDER   = ['principal','secundaria','relleno'];
+
+function saveMissions() { try { localStorage.setItem('missions_state', JSON.stringify({ missions, misMana })); } catch(e) {} }
+function loadMissions() {
+  try {
+    const d = JSON.parse(localStorage.getItem('missions_state') || '{}');
+    if (Array.isArray(d.missions)) missions = d.missions;
+    if (typeof d.misMana === 'number') misMana = d.misMana;
+  } catch(e) {}
+}
+
+function refreshMisMana() { const el=document.getElementById('misManaDisplay'); if(el) el.textContent=misMana; }
+
+function openNewMissionModal() {
+  document.getElementById('missionNameInput').value = '';
+  selectedMisCat='principal'; selectedMisWhen='hoy';
+  document.querySelectorAll('#catRow .cat-btn').forEach(b=>b.classList.toggle('selected', b.dataset.cat==='principal'));
+  document.querySelectorAll('#whenRow .when-btn').forEach(b=>b.classList.toggle('selected', b.dataset.when==='hoy'));
+  document.getElementById('newMissionModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('missionNameInput').focus(), 80);
+}
+function closeNewMissionModal() { document.getElementById('newMissionModal').classList.add('hidden'); }
+
+function openEditMissionModal(id) {
+  const m=missions.find(x=>x.id===id); if(!m) return;
+  editingMissionId=id;
+  document.getElementById('editMissionNameInput').value=m.name;
+  selectedEditMisCat=m.category; selectedEditMisWhen=m.when;
+  document.querySelectorAll('#editCatRow .cat-btn').forEach(b=>b.classList.toggle('selected', b.dataset.cat===m.category));
+  document.querySelectorAll('#editWhenRow .when-btn').forEach(b=>b.classList.toggle('selected', b.dataset.when===m.when));
+  document.getElementById('editMissionModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('editMissionNameInput').focus(), 80);
+}
+function closeEditMissionModal() { document.getElementById('editMissionModal').classList.add('hidden'); editingMissionId=null; }
+
+function openDeleteMissionModal(id) { deletingMissionId=id; document.getElementById('deleteMissionModal').classList.remove('hidden'); }
+function closeDeleteMissionModal() { document.getElementById('deleteMissionModal').classList.add('hidden'); deletingMissionId=null; }
+
+function selectCat(btn)     { document.querySelectorAll('#catRow .cat-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); selectedMisCat=btn.dataset.cat; }
+function selectWhen(btn)    { document.querySelectorAll('#whenRow .when-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); selectedMisWhen=btn.dataset.when; }
+function selectEditCat(btn) { document.querySelectorAll('#editCatRow .cat-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); selectedEditMisCat=btn.dataset.cat; }
+function selectEditWhen(btn){ document.querySelectorAll('#editWhenRow .when-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); selectedEditMisWhen=btn.dataset.when; }
+
+function addMission() {
+  const input=document.getElementById('missionNameInput');
+  const name=input.value.trim().toUpperCase(); if(!name){input.focus();return;}
+  missions.push({id:Date.now(), name, category:selectedMisCat, when:selectedMisWhen});
+  saveMissions(); renderMissions(); closeNewMissionModal();
+  playHabitCreatedSound();
+}
+function saveEditMission() {
+  if(!editingMissionId) return;
+  const m=missions.find(x=>x.id===editingMissionId); if(!m) return;
+  const n=document.getElementById('editMissionNameInput').value.trim().toUpperCase();
+  if(!n){document.getElementById('editMissionNameInput').focus();return;}
+  m.name=n; m.category=selectedEditMisCat; m.when=selectedEditMisWhen;
+  saveMissions(); renderMissions(); closeEditMissionModal();
+}
+function confirmDeleteMission() {
+  if(!deletingMissionId) return;
+  missions=missions.filter(x=>x.id!==deletingMissionId);
+  saveMissions(); renderMissions(); closeDeleteMissionModal();
+}
+
+function completeMission(id) {
+  const m=missions.find(x=>x.id===id); if(!m) return;
+  const card=document.querySelector(`[data-mis-id="${id}"]`);
+  if(card){ card.style.transition='opacity 0.35s,transform 0.35s'; card.style.opacity='0'; card.style.transform='scale(0.95)'; }
+  setTimeout(()=>{
+    missions=missions.filter(x=>x.id!==id);
+    misMana++;
+    saveMissions(); refreshMisMana(); renderMissions();
+    playHabitCompleteSound();
+  }, 380);
+}
+
+function sealMisMana(btnEl) {
+  if(misMana===0) return;
+  const amount=misMana; S.sealedMana+=amount; misMana=0;
+  saveState(); saveMissions();
+  refreshMana(); refreshMisMana();
+  playSealSound();
+  if(btnEl) animateSealOrbs(btnEl, amount);
+}
+
+function renderMissions() {
+  const list=document.getElementById('misionList'); if(!list) return;
+  refreshMisMana(); list.innerHTML='';
+
+  if(!missions.length){
+    list.innerHTML='<div style="font-size:6px;color:#3A3560;text-align:center;letter-spacing:1px;line-height:2.5;">NO HAY MISIONES.<br>CREA UNA ARRIBA.</div>';
+    return;
+  }
+  const byCat={};
+  CAT_ORDER.forEach(c=>{byCat[c]=missions.filter(m=>m.category===c);});
+  CAT_ORDER.forEach(cat=>{
+    const group=byCat[cat]; if(!group.length) return;
+    const section=document.createElement('div'); section.className='mis-section';
+    const title=document.createElement('div'); title.className=`mis-section-title ${cat}`;
+    title.textContent=CAT_LABELS[cat]; section.appendChild(title);
+    group.forEach(m=>{
+      const card=document.createElement('div');
+      card.className='mis-card'; card.dataset.misId=m.id;
+      card.onclick=()=>completeMission(m.id);
+      const wl=WHEN_LABELS[m.when];
+      card.innerHTML=`
+        <div class="mis-card-info">
+          <div class="mis-name">${m.name}</div>
+          ${wl?`<div class="mis-when ${m.when}">${wl}</div>`:''}
+        </div>
+        <div class="mis-card-actions">
+          <button class="mis-act-btn edit" onclick="event.stopPropagation();openEditMissionModal(${m.id})">✎</button>
+          <button class="mis-act-btn del"  onclick="event.stopPropagation();openDeleteMissionModal(${m.id})">✕</button>
+        </div>`;
+      section.appendChild(card);
+    });
+    list.appendChild(section);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('load', () => {
-  loadState(); loadHabits();
+  loadState(); loadHabits(); loadJarStars(); loadMissions();
   document.getElementById('ival').textContent=S.interval;
   initStars(); requestAnimationFrame(starsLoop);
-  refreshTimer(); refreshProgress(); refreshMana(); renderHabits();
+  refreshTimer(); refreshProgress(); refreshMana(); renderHabits(); renderMissions();
   habitsTimerId=setInterval(tickHabits, 1000);
+  setTimeout(renderAllJarStars, 80);
 });
 window.addEventListener('resize', () => { SC.width=window.innerWidth; SC.height=window.innerHeight; initStars(); });
 </script>
