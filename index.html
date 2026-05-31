@@ -448,6 +448,31 @@
     .incu-msg.success { color: #AADDFF; text-shadow: 0 0 8px rgba(160,210,255,0.6); }
 
     /* ══════════════════════════════════════════
+       BREAK SESSION
+    ══════════════════════════════════════════ */
+    .break-section {
+      width: 100%; max-width: 350px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      border: 1px solid rgba(68,220,255,0.25);
+      padding: 16px 16px 14px;
+      background: rgba(0,18,36,0.60);
+      animation: fadeInBreak 0.5s ease-out;
+    }
+    @keyframes fadeInBreak {
+      from { opacity:0; transform:translateY(10px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .break-label { font-size: 6px; color: #44DDFF; letter-spacing: 2px; text-align: center; text-shadow: 0 0 10px rgba(68,220,255,0.55); }
+    .break-type  { font-size: 5px; color: #337799; letter-spacing: 1px; text-align: center; }
+    .break-timer-num {
+      font-size: 38px; letter-spacing: 4px; line-height: 1; text-align: center;
+      color: #44EEFF;
+      text-shadow: 0 0 14px rgba(68,238,255,0.65), 0 0 28px rgba(0,210,240,0.25);
+    }
+    .btn-skip     { color: #446688; border-color: #446688; box-shadow: 0 0 8px rgba(68,100,136,.12); }
+    .btn-break-go { color: #44DDFF; border-color: #44DDFF; box-shadow: 0 0 10px rgba(68,221,255,.18), inset 0 0 10px rgba(68,221,255,.04); }
+
+    /* ══════════════════════════════════════════
        MISIONES
     ══════════════════════════════════════════ */
     .misiones-ui {
@@ -617,17 +642,34 @@
       <div class="streak" id="streak">MANA RECOLECTADO: 0</div>
     </div>
 
+    <!-- BREAK SECTION -->
+    <div class="g12"></div>
+    <div class="break-section" id="breakSection" style="display:none">
+      <div class="break-label" id="breakLabel">SESIÓN DE DESCANSO</div>
+      <div class="break-type" id="breakType">DESCANSO CORTO · +1 MANA</div>
+      <div class="break-timer-num" id="breakTimerNum">05:00</div>
+      <div class="interval-row">
+        <button class="ibt" onclick="adjBreak(-1)">-</button>
+        <div class="ival" id="breakIval">5</div>
+        <button class="ibt" onclick="adjBreak(+1)">+</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-break-go" id="startBreakBtn" onclick="toggleBreak()">INICIAR</button>
+        <button class="btn btn-skip" onclick="skipBreak()">OMITIR</button>
+      </div>
+    </div>
+
     <div class="g16"></div>
     <div class="divider"></div>
     <div class="g16"></div>
 
-    <div class="btn-row">
+    <div class="btn-row" id="mainBtnRow">
       <button class="btn btn-go" id="startBtn" onclick="toggleTimer()">INICIAR</button>
       <button class="btn btn-stop" onclick="resetAll()">RESET</button>
     </div>
     <div class="g12"></div>
 
-    <div class="interval-wrap">
+    <div class="interval-wrap" id="mainIntervalWrap">
       <div class="interval-label">INTERVALO (MIN)</div>
       <div class="g8"></div>
       <div class="interval-row">
@@ -862,7 +904,7 @@ const FLASH_COLORS = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#E
 // ═══════════════════════════════════════════════════════════
 //  POMODORO STATE
 // ═══════════════════════════════════════════════════════════
-const S = { mana: 0, sealedMana: 0, interval: 25, remaining: 25*60, total: 25*60, running: false, warnedAt60: false };
+const S = { mana: 0, sealedMana: 0, interval: 25, remaining: 25*60, total: 25*60, running: false, warnedAt60: false, manaForLongBreak: 0 };
 let timerId  = null;
 let hiddenAt = null;
 
@@ -870,14 +912,15 @@ function tier() { return Math.min(Math.floor(S.mana / 5), TIER_CLASSES.length - 
 function getManaReward() { return S.interval >= 30 ? 3 : S.interval >= 20 ? 2 : 1; }
 
 function saveState() {
-  try { localStorage.setItem('pomodoro_state', JSON.stringify({ mana: S.mana, sealedMana: S.sealedMana, interval: S.interval })); } catch(e) {}
+  try { localStorage.setItem('pomodoro_state', JSON.stringify({ mana: S.mana, sealedMana: S.sealedMana, interval: S.interval, manaForLongBreak: S.manaForLongBreak })); } catch(e) {}
 }
 function loadState() {
   try {
     const d = JSON.parse(localStorage.getItem('pomodoro_state') || '{}');
     if (typeof d.mana       === 'number') S.mana       = d.mana;
     if (typeof d.sealedMana === 'number') S.sealedMana = d.sealedMana;
-    if (typeof d.interval   === 'number') { S.interval = Math.max(1, Math.min(90, d.interval)); S.remaining = S.interval*60; S.total = S.remaining; }
+    if (typeof d.interval           === 'number') { S.interval = Math.max(1, Math.min(90, d.interval)); S.remaining = S.interval*60; S.total = S.remaining; }
+    if (typeof d.manaForLongBreak   === 'number') S.manaForLongBreak = d.manaForLongBreak;
   } catch(e) {}
 }
 
@@ -1218,6 +1261,7 @@ function refreshProgress() {
 function toggleTimer() { S.running ? pauseTimer() : startTimer(); }
 function startTimer() {
   if (S.remaining<=0) return; getAudio(); S.running=true;
+  hideBreak(); // hide break when starting new work session
   document.getElementById('startBtn').textContent='PAUSAR';
   timerId=setInterval(tick,1000);
 }
@@ -1233,10 +1277,16 @@ function tick() {
 function completePomodoro() {
   clearInterval(timerId); S.running=false;
   const earned=getManaReward(); S.mana+=earned; S.warnedAt60=false;
+  // Track mana toward long break
+  S.manaForLongBreak += earned;
+  const isLong = S.manaForLongBreak >= 4;
+  if (isLong) S.manaForLongBreak = 0;
   saveState(); playCompleteSound(); refreshMana(); showFlash(earned);
   S.remaining=S.interval*60; S.total=S.remaining;
   refreshTimer(); refreshProgress();
   document.getElementById('startBtn').textContent='INICIAR';
+  // Show break suggestion
+  showBreakSuggestion(isLong);
 }
 
 function resetAll() {
@@ -1244,6 +1294,97 @@ function resetAll() {
   S.remaining=S.interval*60; S.total=S.remaining;
   saveState(); refreshTimer(); refreshProgress(); refreshMana();
   document.getElementById('startBtn').textContent='INICIAR';
+  hideBreak();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BREAK SESSION
+// ═══════════════════════════════════════════════════════════
+let breakTimerId = null;
+const B = { running: false, remaining: 0, total: 0, interval: 5, isLong: false };
+
+function getBreakMinutes(isLong) {
+  const base = S.interval <= 15 ? 5 : S.interval <= 25 ? 10 : 15;
+  return isLong ? base * 2 : base;
+}
+
+function setSessionBlocked(blocked) {
+  ['timer', 'mainBtnRow', 'mainIntervalWrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.transition    = 'opacity 0.4s';
+    el.style.opacity       = blocked ? '0.15' : '1';
+    el.style.pointerEvents = blocked ? 'none' : '';
+    el.style.userSelect    = blocked ? 'none' : '';
+  });
+}
+
+function showBreakSuggestion(isLong) {
+  B.running  = false;
+  B.isLong   = isLong;
+  B.interval = getBreakMinutes(isLong);
+  B.remaining = B.interval * 60;
+  B.total     = B.remaining;
+
+  const sec = document.getElementById('breakSection');
+  if (!sec) return;
+  document.getElementById('breakLabel').textContent = isLong ? 'DESCANSO LARGO' : 'SESIÓN DE DESCANSO';
+  document.getElementById('breakType').textContent  = isLong ? 'DESCANSO LARGO · +2 MANA' : 'DESCANSO CORTO · +1 MANA';
+  document.getElementById('breakIval').textContent  = B.interval;
+  document.getElementById('startBreakBtn').textContent = 'INICIAR';
+  refreshBreakTimer();
+  sec.style.display = 'flex';
+  setSessionBlocked(true);
+}
+
+function hideBreak() {
+  clearInterval(breakTimerId);
+  B.running = false;
+  const sec = document.getElementById('breakSection');
+  if (sec) sec.style.display = 'none';
+  setSessionBlocked(false);
+}
+
+function adjBreak(d) {
+  if (B.running) return;
+  B.interval  = Math.max(1, Math.min(60, B.interval + d));
+  B.remaining = B.interval * 60;
+  B.total     = B.remaining;
+  document.getElementById('breakIval').textContent = B.interval;
+  refreshBreakTimer();
+}
+
+function toggleBreak() {
+  if (B.running) {
+    clearInterval(breakTimerId); B.running = false;
+    document.getElementById('startBreakBtn').textContent = 'REANUDAR';
+  } else {
+    getAudio(); B.running = true;
+    document.getElementById('startBreakBtn').textContent = 'PAUSAR';
+    breakTimerId = setInterval(tickBreak, 1000);
+  }
+}
+
+function tickBreak() {
+  if (B.remaining <= 0) return;
+  B.remaining--;
+  refreshBreakTimer();
+  if (B.remaining <= 0) completeBreak();
+}
+
+function completeBreak() {
+  clearInterval(breakTimerId); B.running = false;
+  const earned = B.isLong ? 2 : 1;
+  S.mana += earned;
+  saveState(); playCompleteSound(); refreshMana(); showFlash(earned);
+  hideBreak();
+}
+
+function skipBreak() { hideBreak(); }
+
+function refreshBreakTimer() {
+  const el = document.getElementById('breakTimerNum');
+  if (el) el.textContent = fmt(B.remaining);
 }
 
 // ═══════════════════════════════════════════════════════════
