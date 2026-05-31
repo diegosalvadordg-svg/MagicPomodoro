@@ -919,7 +919,7 @@ function loadState() {
     const d = JSON.parse(localStorage.getItem('pomodoro_state') || '{}');
     if (typeof d.mana       === 'number') S.mana       = d.mana;
     if (typeof d.sealedMana === 'number') S.sealedMana = d.sealedMana;
-    if (typeof d.interval           === 'number') { S.interval = Math.max(1, Math.min(90, d.interval)); S.remaining = S.interval*60; S.total = S.remaining; }
+    if (typeof d.interval           === 'number') { S.interval = Math.max(5, Math.min(60, d.interval)); S.remaining = S.interval*60; S.total = S.remaining; }
     if (typeof d.manaForLongBreak   === 'number') S.manaForLongBreak = d.manaForLongBreak;
   } catch(e) {}
 }
@@ -1481,7 +1481,7 @@ function animateSealOrbs(fromEl, amount) {
 // ═══════════════════════════════════════════════════════════
 function adjInterval(d) {
   if (S.running) return;
-  S.interval=Math.max(1, Math.min(90, S.interval+d));
+  S.interval=Math.max(5, Math.min(60, S.interval+d));
   S.remaining=S.interval*60; S.total=S.remaining;
   document.getElementById('ival').textContent=S.interval;
   saveState(); refreshTimer(); refreshProgress();
