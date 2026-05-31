@@ -21,30 +21,16 @@
     }
 
     /* ══════════════════════════════════════════
-       SCENE — fixed backdrop
+       SCENE
     ══════════════════════════════════════════ */
     .scene {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
+      position: fixed; inset: 0; z-index: 0;
       background: linear-gradient(180deg,
-        #05071A 0%,
-        #090E30 18%,
-        #0D1545 38%,
-        #0B1238 62%,
-        #09100E 85%,
-        #060C08 100%
-      );
+        #05071A 0%, #090E30 18%, #0D1545 38%,
+        #0B1238 62%, #09100E 85%, #060C08 100%);
     }
+    #stars { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
 
-    #stars {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* ── CLOUDS ── */
     .cloud { position: fixed; pointer-events: none; z-index: 3; border-radius: 50%; }
     .cl1 { width:240px; height:160px; top:22%; left:-70px;
            background: radial-gradient(ellipse 68% 58% at 62% 50%, #231650 0%, #170E3A 45%, transparent 100%);
@@ -59,114 +45,100 @@
            background: radial-gradient(ellipse 70% 60% at 35% 50%, #180E38 0%, transparent 100%);
            filter: blur(22px); }
 
-    /* Scanlines */
     body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg, transparent 0px, transparent 3px,
-        rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
-      );
-      pointer-events: none;
-      z-index: 800;
+      content: ''; position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px,
+        rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px);
+      pointer-events: none; z-index: 800;
     }
 
     /* ══════════════════════════════════════════
-       UI — overlay
+       BOTTOM NAV
     ══════════════════════════════════════════ */
-    .ui {
-      position: relative;
-      z-index: 10;
-      min-height: 100dvh;
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 600;
+      height: calc(56px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: rgba(4,7,22,0.97);
+      border-top: 1px solid rgba(68,255,204,0.12);
+      display: flex;
+    }
+    .nav-tab {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 5px;
+      color: #3A5570;
+      letter-spacing: 1px;
+      padding: 0;
+      transition: color .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-tab.active { color: #44FFCC; }
+    .nav-tab .nav-icon { font-size: 16px; line-height: 1; }
+    .nav-tab.active .nav-icon { filter: drop-shadow(0 0 6px rgba(68,255,204,0.7)); }
+
+    /* ══════════════════════════════════════════
+       SCREENS
+    ══════════════════════════════════════════ */
+    .screen {
+      position: fixed; inset: 0;
+      bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+      z-index: 10; display: none;
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .screen.active { display: block; }
+
+    /* ══════════════════════════════════════════
+       CATALIZADOR
+    ══════════════════════════════════════════ */
+    .ui {
+      min-height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       padding-top: max(52px, env(safe-area-inset-top, 52px));
-      padding-right: 22px;
-      padding-left: 22px;
-      padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      padding-right: 22px; padding-left: 22px; padding-bottom: 24px;
       gap: 0;
     }
-
-    /* ── TITLE ── */
     .title {
-      font-size: 7px;
-      color: #8899BB;
-      letter-spacing: 2px;
-      text-align: center;
-      text-shadow: 0 0 10px rgba(100,150,220,0.35);
-      line-height: 2;
+      font-size: 7px; color: #8899BB; letter-spacing: 2px;
+      text-align: center; text-shadow: 0 0 10px rgba(100,150,220,0.35); line-height: 2;
     }
-
-    /* ── TIMER ── */
     .timer {
-      font-size: 54px;
-      letter-spacing: 5px;
-      color: #E8F8FF;
+      font-size: 54px; letter-spacing: 5px; color: #E8F8FF;
       text-shadow: 0 0 14px rgba(200,240,255,0.55), 0 0 30px rgba(160,220,255,0.20);
-      line-height: 1;
-      text-align: center;
-      transition: color .8s, text-shadow .8s;
+      line-height: 1; text-align: center; transition: color .8s, text-shadow .8s;
     }
     .timer.tc1 { color: #44FFEE; text-shadow: 0 0 14px rgba(68,255,238,0.65), 0 0 30px rgba(0,200,180,0.25); }
     .timer.tc2 { color: #FFCC44; text-shadow: 0 0 14px rgba(255,200,60,0.72), 0 0 30px rgba(255,160,0,0.28); }
     .timer.tc3 { color: #FFF0A0; text-shadow: 0 0 14px rgba(255,240,140,0.80), 0 0 30px rgba(255,220,80,0.35); }
     .timer.tc4 { color: #00FF88; text-shadow: 0 0 16px rgba(0,255,136,0.88), 0 0 32px rgba(0,200,100,0.40); }
 
-    /* ── DIVIDER ── */
     .divider {
-      width: 100%;
-      max-width: 350px;
-      height: 1px;
+      width: 100%; max-width: 350px; height: 1px;
       background: linear-gradient(90deg, transparent, rgba(80,120,180,0.25) 30%,
                                          rgba(80,120,180,0.25) 70%, transparent);
     }
+    .mana-section { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+    .mana-label { font-size: 7px; color: #557799; letter-spacing: 2px; text-align: center; }
+    .mana-label span { color: #88CCFF; }
 
-    /* ── MANA SECTION ── */
-    .mana-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      width: 100%;
-    }
-    .mana-label {
-      font-size: 7px;
-      color: #557799;
-      letter-spacing: 2px;
-      text-align: center;
-    }
-    .mana-label span {
-      color: #88CCFF;
-    }
-
-    /* Gem + number stacked */
     .mana-gem-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100px;
-      height: 118px;
+      position: relative; display: flex; align-items: center; justify-content: center;
+      width: 100px; height: 118px;
     }
-    .gem-icon {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 0;
-    }
+    .gem-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 0; }
     .mana-num {
-      position: relative;
-      z-index: 1;
-      font-size: 32px;
-      color: #44FFCC;
-      text-shadow: 0 0 10px rgba(68,255,204,0.70);
-      text-align: center;
-      transition: color .5s, text-shadow .5s;
-      min-width: 3ch;
+      position: relative; z-index: 1; font-size: 32px; color: #44FFCC;
+      text-shadow: 0 0 10px rgba(68,255,204,0.70); text-align: center;
+      transition: color .5s, text-shadow .5s; min-width: 3ch;
     }
     .mana-num.t1 { color: #44FFEE; text-shadow: 0 0 10px rgba(68,255,238,.70); }
     .mana-num.t2 { color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,.75), 0 0 22px rgba(255,170,0,.30); }
@@ -174,272 +146,327 @@
     .mana-num.t4 { color: #FF88CC; text-shadow: 0 0 10px rgba(255,136,204,.70); }
     .mana-num.t5 { color: #EEEEFF; text-shadow: 0 0 12px rgba(220,220,255,.90); }
 
-    /* Pips */
-    .pips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      justify-content: center;
-      max-width: 250px;
-    }
-    .pip {
-      width: 10px; height: 10px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.10);
-    }
-    .pip.on {
-      background: var(--pc, #44FFCC);
-      box-shadow: 0 0 5px var(--pc, #44FFCC);
-      border-color: transparent;
-    }
+    .pips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; max-width: 250px; }
+    .pip { width: 10px; height: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10); }
+    .pip.on { background: var(--pc,#44FFCC); box-shadow: 0 0 5px var(--pc,#44FFCC); border-color: transparent; }
     .pip-extra { font-size: 6px; color: #446688; align-self: center; }
 
-    .streak {
-      font-size: 7px;
-      color: #44FF88;
-      text-shadow: 0 0 6px rgba(68,255,136,0.50);
-      text-align: center;
-      letter-spacing: 1px;
-    }
+    .streak { font-size: 7px; color: #44FF88; text-shadow: 0 0 6px rgba(68,255,136,0.50); text-align: center; letter-spacing: 1px; }
 
-    /* ── BUTTONS ── */
-    .btn-row {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-      max-width: 350px;
-    }
+    .btn-row { display: flex; gap: 12px; width: 100%; max-width: 350px; }
     .btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      flex: 1;
-      padding: 13px 6px;
-      background: transparent;
-      border: 2px solid;
-      cursor: pointer;
-      text-align: center;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .05s, opacity .1s;
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      font-family: 'Press Start 2P', monospace; font-size: 9px; flex: 1;
+      padding: 13px 6px; background: transparent; border: 2px solid; cursor: pointer;
+      text-align: center; -webkit-tap-highlight-color: transparent;
+      transition: transform .05s, opacity .1s; border-radius: 3px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn:active { transform: translateY(2px); opacity: .8; }
-    .btn-go   { color: #44FFCC; border-color: #44FFCC;
-                box-shadow: 0 0 10px rgba(68,255,204,.18), inset 0 0 10px rgba(68,255,204,.04); }
-    .btn-stop { color: #FF5566; border-color: #FF5566;
-                box-shadow: 0 0 10px rgba(255,85,102,.18), inset 0 0 10px rgba(255,85,102,.04); }
+    .btn-go   { color: #44FFCC; border-color: #44FFCC; box-shadow: 0 0 10px rgba(68,255,204,.18), inset 0 0 10px rgba(68,255,204,.04); }
+    .btn-stop { color: #FF5566; border-color: #FF5566; box-shadow: 0 0 10px rgba(255,85,102,.18), inset 0 0 10px rgba(255,85,102,.04); }
     .btn-seal {
-      color: #88CCFF;
-      border-color: #88CCFF;
+      color: #88CCFF; border-color: #88CCFF;
       box-shadow: 0 0 10px rgba(136,204,255,0.22), inset 0 0 10px rgba(136,204,255,0.05);
-      width: 210px;
-      flex: none;
+      width: 210px; flex: none;
     }
 
-    /* ── INTRO MODAL ── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(4,7,22,0.94);
-      z-index: 950;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 28px;
-      animation: modalIn 0.5s ease-out;
-    }
-    @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-    .modal-box {
-      border: 2px solid rgba(68,255,204,0.35);
-      background: rgba(6,9,26,0.98);
-      padding: 30px 22px;
-      max-width: 300px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: 0 0 48px rgba(68,255,204,0.07), inset 0 0 24px rgba(0,0,0,0.6);
-    }
-    .modal-title {
-      font-size: 7px;
-      color: #44FFCC;
-      letter-spacing: 2px;
-      text-align: center;
-      text-shadow: 0 0 10px rgba(68,255,204,0.50);
-      margin-bottom: 18px;
-    }
-    .modal-text {
-      font-size: 6px;
-      color: #7799BB;
-      line-height: 2.4;
-      text-align: center;
-      letter-spacing: 0.5px;
-      margin-bottom: 24px;
-    }
-    .btn-modal {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: #44FFCC;
-      border: 2px solid #44FFCC;
-      background: transparent;
-      padding: 12px 14px;
-      cursor: pointer;
-      width: 100%;
-      -webkit-tap-highlight-color: transparent;
-      box-shadow: 0 0 10px rgba(68,255,204,0.18), inset 0 0 10px rgba(68,255,204,0.04);
-      letter-spacing: 1px;
-      border-radius: 3px;
-    }
-    .btn-modal:active { transform: translateY(2px); opacity: .8; }
-
-    /* ── INTERVAL ── */
-    .interval-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
+    .interval-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .interval-label { font-size: 6px; color: #557799; letter-spacing: 2px; }
-    .interval-row   { display: flex; align-items: center; gap: 18px; }
+    .interval-row { display: flex; align-items: center; gap: 18px; }
     .ibt {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 15px;
-      color: #44AACC;
-      background: rgba(68,170,204,0.07);
-      border: 2px solid rgba(68,170,204,0.28);
-      width: 36px; height: 36px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 3px;
+      font-family: 'Press Start 2P', monospace; font-size: 15px; color: #44AACC;
+      background: rgba(68,170,204,0.07); border: 2px solid rgba(68,170,204,0.28);
+      width: 36px; height: 36px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; border-radius: 3px;
       -webkit-tap-highlight-color: transparent;
     }
     .ibt:active { background: rgba(68,170,204,0.18); transform: translateY(1px); }
     .ival { font-size: 20px; color: #66CCEE; min-width: 3ch; text-align: center; }
 
-    /* ── COMPLETION FLASH ── */
+    /* ── FLASH ── */
     .flash-layer {
-      position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
       z-index: 500; pointer-events: none;
     }
     .flash-msg {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 15px;
-      line-height: 2.2;
-      padding: 22px 30px;
-      background: rgba(4,7,22,0.96);
-      border: 2px solid;
-      text-align: center;
-      animation: popIn .14s ease-out, fadeUp 2.4s .5s forwards;
+      font-family: 'Press Start 2P', monospace; font-size: 15px; line-height: 2.2;
+      padding: 22px 30px; background: rgba(4,7,22,0.96); border: 2px solid;
+      text-align: center; animation: popIn .14s ease-out, fadeUp 2.4s .5s forwards;
     }
-    @keyframes popIn {
-      from { transform: scale(.65); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
+    @keyframes popIn { from { transform: scale(.65); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-70px); opacity: 0; } }
+
+    /* ══════════════════════════════════════════
+       MODALES GENÉRICOS
+    ══════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(4,7,22,0.94); z-index: 950;
+      display: flex; align-items: center; justify-content: center; padding: 28px;
+      animation: modalIn 0.5s ease-out;
     }
-    @keyframes fadeUp {
-      from { transform: translateY(0); opacity: 1; }
-      to   { transform: translateY(-70px); opacity: 0; }
+    .modal-overlay.hidden { display: none; }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .modal-box {
+      border: 2px solid rgba(68,255,204,0.35); background: rgba(6,9,26,0.98);
+      padding: 30px 22px; max-width: 300px; width: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      box-shadow: 0 0 48px rgba(68,255,204,0.07), inset 0 0 24px rgba(0,0,0,0.6);
+    }
+    .modal-box.purple {
+      border-color: rgba(170,100,255,0.35);
+      box-shadow: 0 0 48px rgba(170,100,255,0.07), inset 0 0 24px rgba(0,0,0,0.6);
+    }
+    .modal-title { font-size: 7px; color: #44FFCC; letter-spacing: 2px; text-align: center; text-shadow: 0 0 10px rgba(68,255,204,0.50); margin-bottom: 18px; }
+    .modal-title.purple { color: #AA88FF; text-shadow: 0 0 10px rgba(170,136,255,0.50); }
+    .modal-text { font-size: 6px; color: #7799BB; line-height: 2.4; text-align: center; letter-spacing: 0.5px; margin-bottom: 24px; }
+    .btn-modal {
+      font-family: 'Press Start 2P', monospace; font-size: 7px; color: #44FFCC;
+      border: 2px solid #44FFCC; background: transparent; padding: 12px 14px;
+      cursor: pointer; width: 100%; -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 0 10px rgba(68,255,204,0.18), inset 0 0 10px rgba(68,255,204,0.04);
+      letter-spacing: 1px; border-radius: 3px;
+    }
+    .btn-modal:active { transform: translateY(2px); opacity: .8; }
+
+    /* ══════════════════════════════════════════
+       CLARIVIDENTE
+    ══════════════════════════════════════════ */
+    .habits-ui {
+      min-height: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      padding-top: max(52px, env(safe-area-inset-top, 52px));
+      padding-right: 18px; padding-left: 18px; padding-bottom: 24px;
+      gap: 0;
     }
 
+    .clari-header {
+      width: 100%; max-width: 350px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .clari-sealed {
+      font-size: 6px; color: #7755AA; letter-spacing: 2px; text-align: center;
+    }
+    .clari-sealed span { color: #CCAAFF; text-shadow: 0 0 8px rgba(200,160,255,0.5); }
+
+    /* Create habit modal */
+    .habit-form-modal {
+      width: 100%; display: flex; flex-direction: column; gap: 14px;
+    }
+    .habit-input {
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      background: rgba(170,100,255,0.06); border: 1px solid rgba(170,100,255,0.28);
+      color: #CCBBFF; padding: 10px 12px; width: 100%; outline: none;
+      border-radius: 2px; letter-spacing: 1px;
+    }
+    .habit-input::placeholder { color: rgba(170,136,255,0.30); }
+    .habit-input:focus { border-color: rgba(170,100,255,0.65); }
+
+    .freq-label { font-size: 5px; color: #6655AA; letter-spacing: 2px; text-align: center; }
+    .freq-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .freq-btn {
+      font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 8px 10px;
+      background: rgba(170,100,255,0.06); border: 1px solid rgba(170,100,255,0.28);
+      color: #8866CC; cursor: pointer; border-radius: 2px;
+      -webkit-tap-highlight-color: transparent; transition: background .1s, border-color .1s, color .1s;
+    }
+    .freq-btn.selected { background: rgba(170,100,255,0.20); border-color: #AA88FF; color: #CCAAFF; box-shadow: 0 0 8px rgba(170,136,255,0.25); }
+    .freq-btn:active { opacity: .7; }
+
+    .btn-new-habit {
+      font-family: 'Press Start 2P', monospace; font-size: 7px; padding: 12px;
+      background: transparent; border: 2px solid #AA88FF; color: #AA88FF;
+      cursor: pointer; width: 100%; max-width: 350px; border-radius: 3px;
+      letter-spacing: 1px; box-shadow: 0 0 10px rgba(170,136,255,0.18);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-new-habit:active { transform: translateY(2px); opacity: .8; }
+
+    .btn-purple {
+      font-family: 'Press Start 2P', monospace; font-size: 7px; color: #AA88FF;
+      border: 2px solid #AA88FF; background: transparent; padding: 12px 14px;
+      cursor: pointer; width: 100%; -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 0 10px rgba(170,136,255,0.18), inset 0 0 10px rgba(170,136,255,0.04);
+      letter-spacing: 1px; border-radius: 3px; margin-top: 6px;
+    }
+    .btn-purple:active { transform: translateY(2px); opacity: .8; }
+
+    /* Habit cards */
+    .habit-list { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 12px; }
+    .habit-card {
+      border: 1px solid rgba(170,100,255,0.22); background: rgba(8,6,22,0.80);
+      padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .habit-card.done   { border-color: rgba(68,255,136,0.30); background: rgba(6,18,12,0.80); }
+    .habit-card.expired { border-color: rgba(255,80,80,0.30); background: rgba(22,6,6,0.80); }
+
+    .habit-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .habit-name { font-size: 7px; color: #CCBBFF; letter-spacing: 1px; flex: 1; line-height: 1.8; }
+    .habit-card.done .habit-name   { color: #44FF88; }
+    .habit-card.expired .habit-name { color: #FF6677; }
+
+    .habit-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .habit-action-btn {
+      font-family: 'Press Start 2P', monospace; font-size: 6px;
+      background: transparent; border: 1px solid; cursor: pointer; padding: 4px 7px;
+      border-radius: 2px; -webkit-tap-highlight-color: transparent;
+      line-height: 1;
+    }
+    .habit-action-btn.edit   { color: rgba(100,180,255,0.55); border-color: rgba(100,180,255,0.25); }
+    .habit-action-btn.edit:active   { color: #88CCFF; border-color: #88CCFF; }
+    .habit-action-btn.del    { color: rgba(255,80,80,0.45); border-color: rgba(255,80,80,0.20); }
+    .habit-action-btn.del:active    { color: #FF5566; border-color: #FF5566; }
+
+    .habit-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .habit-streak { font-size: 6px; color: #9977FF; letter-spacing: 1px; }
+    .habit-streak .streak-val { color: #FFCC44; text-shadow: 0 0 6px rgba(255,200,60,0.5); }
+    .habit-mana-rate { font-size: 5px; color: #44FFCC; letter-spacing: 1px; }
+
+    .habit-countdown { font-size: 8px; color: #6655AA; letter-spacing: 1px; text-align: center; }
+    .habit-countdown.urgent   { color: #FF9944; text-shadow: 0 0 6px rgba(255,140,50,0.5); }
+    .habit-countdown.critical { color: #FF4455; text-shadow: 0 0 8px rgba(255,50,70,0.6); }
+
+    .habit-bar-bg { width: 100%; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+    .habit-bar-fill { height: 100%; background: #7755CC; border-radius: 2px; transition: width .8s linear, background .8s; }
+    .habit-card.done .habit-bar-fill { background: #44FF88; }
+
+    .habit-btn-row { display: flex; gap: 8px; }
+    .btn-complete {
+      font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 9px;
+      background: transparent; border: 1px solid rgba(170,100,255,0.40); color: #9966CC;
+      cursor: pointer; flex: 1; border-radius: 2px; letter-spacing: 1px;
+      -webkit-tap-highlight-color: transparent; transition: background .1s, border-color .1s, color .1s;
+    }
+    .btn-complete:active { opacity: .7; }
+    .btn-complete.done-state { border-color: rgba(68,255,136,0.40); color: #44FF88; background: rgba(68,255,136,0.06); }
+    .btn-complete:disabled { opacity: 0.5; cursor: default; }
+
+    .btn-habit-seal {
+      font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 9px;
+      background: transparent; border: 1px solid rgba(136,204,255,0.35); color: #66AADD;
+      cursor: pointer; flex: 1; border-radius: 2px; letter-spacing: 1px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-habit-seal:active { opacity: .7; }
+    .btn-habit-seal:disabled { opacity: 0.3; cursor: default; }
+
+    /* Edit modal extras */
+    .modal-form-row { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .modal-cancel {
+      font-family: 'Press Start 2P', monospace; font-size: 6px; color: #445566;
+      border: 1px solid rgba(68,85,102,0.40); background: transparent; padding: 10px 14px;
+      cursor: pointer; width: 100%; border-radius: 3px; letter-spacing: 1px; margin-top: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .modal-cancel:active { opacity: .7; }
+
     /* Spacing */
-    .g6  { height: 6px; }
-    .g8  { height: 8px; }
-    .g12 { height: 12px; }
-    .g16 { height: 16px; }
-    .g20 { height: 20px; }
-    .g24 { height: 24px; }
+    .g6  { height: 6px; flex-shrink: 0; }
+    .g8  { height: 8px; flex-shrink: 0; }
+    .g12 { height: 12px; flex-shrink: 0; }
+    .g16 { height: 16px; flex-shrink: 0; }
+    .g20 { height: 20px; flex-shrink: 0; }
+    .g24 { height: 24px; flex-shrink: 0; }
   </style>
 </head>
 <body>
 
-<!-- ══════════════  SCENE  ══════════════ -->
+<!-- SCENE -->
 <div class="scene">
   <canvas id="stars"></canvas>
-
-  <div class="cloud cl1"></div>
-  <div class="cloud cl2"></div>
-  <div class="cloud cl3"></div>
-  <div class="cloud cl4"></div>
+  <div class="cloud cl1"></div><div class="cloud cl2"></div>
+  <div class="cloud cl3"></div><div class="cloud cl4"></div>
 </div>
 
-<!-- ══════════════  UI  ══════════════ -->
-<div class="ui">
+<!-- ══════════════  CATALIZADOR  ══════════════ -->
+<div class="screen active" id="screenCatalizador">
+  <div class="ui">
 
-  <div class="title">✦ CANALIZADOR DE MANA ✦</div>
-  <div class="g20"></div>
+    <div class="title">✦ CATALIZADOR ✦</div>
+    <div class="g20"></div>
 
-  <div class="timer" id="timer">25:00</div>
-  <div class="g16"></div>
+    <div class="timer" id="timer">25:00</div>
+    <div class="g16"></div>
+    <div class="divider"></div>
+    <div class="g16"></div>
 
-  <div class="divider"></div>
-  <div class="g16"></div>
-
-  <div class="mana-section">
-    <div class="mana-label">MANA SELLADO: <span id="sealedManaDisplay">0</span></div>
-    <div class="g8"></div>
-
-    <!-- Crystal gem = progress indicator + mana display -->
-    <div class="mana-gem-wrap">
-      <svg class="gem-icon" id="gemIcon" width="100" height="118" viewBox="0 0 42 50">
-        <defs>
-          <clipPath id="gemFillClip">
-            <rect id="gemFillRect" x="-1" y="50" width="44" height="51"/>
-          </clipPath>
-        </defs>
-        <!-- Progress fill: rises from bottom as timer counts down -->
-        <polygon id="gemFillPoly"
-                 points="21,2 38,13 38,37 21,48 4,37 4,13"
-                 fill="rgba(192,238,255,0.30)"
-                 clip-path="url(#gemFillClip)"/>
-        <!-- Crystal outline -->
-        <polygon points="21,2 38,13 38,37 21,48 4,37 4,13"
-                 fill="rgba(68,255,204,0.06)" stroke="#44FFCC" stroke-width="1.5" opacity="0.80"/>
-        <polygon points="21,8 33,16 21,42 9,16"
-                 fill="rgba(68,255,204,0.09)"/>
-        <line x1="21" y1="2"  x2="21" y2="48" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
-        <line x1="4"  y1="13" x2="38" y2="37" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
-        <line x1="38" y1="13" x2="4"  y2="37" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
-      </svg>
-      <div class="mana-num" id="manaNum">0</div>
+    <div class="mana-section">
+      <div class="mana-label">MANA SELLADO: <span id="sealedManaDisplay">0</span></div>
+      <div class="g8"></div>
+      <div class="mana-gem-wrap">
+        <svg class="gem-icon" id="gemIcon" width="100" height="118" viewBox="0 0 42 50">
+          <defs><clipPath id="gemFillClip"><rect id="gemFillRect" x="-1" y="50" width="44" height="51"/></clipPath></defs>
+          <polygon id="gemFillPoly" points="21,2 38,13 38,37 21,48 4,37 4,13" fill="rgba(192,238,255,0.30)" clip-path="url(#gemFillClip)"/>
+          <polygon points="21,2 38,13 38,37 21,48 4,37 4,13" fill="rgba(68,255,204,0.06)" stroke="#44FFCC" stroke-width="1.5" opacity="0.80"/>
+          <polygon points="21,8 33,16 21,42 9,16" fill="rgba(68,255,204,0.09)"/>
+          <line x1="21" y1="2"  x2="21" y2="48" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
+          <line x1="4"  y1="13" x2="38" y2="37" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
+          <line x1="38" y1="13" x2="4"  y2="37" stroke="#44FFCC" stroke-width="0.6" opacity="0.22"/>
+        </svg>
+        <div class="mana-num" id="manaNum">0</div>
+      </div>
+      <div class="g6"></div>
+      <div class="pips" id="pips"></div>
+      <div class="g8"></div>
+      <div class="streak" id="streak">MANA RECOLECTADO: 0</div>
     </div>
 
-    <div class="g6"></div>
-    <div class="pips" id="pips"></div>
-    <div class="g8"></div>
-    <div class="streak" id="streak">MANA RECOLECTADO: 0</div>
-  </div>
+    <div class="g16"></div>
+    <div class="divider"></div>
+    <div class="g16"></div>
 
-  <div class="g16"></div>
-  <div class="divider"></div>
-  <div class="g16"></div>
-
-  <div class="btn-row">
-    <button class="btn btn-go"  id="startBtn" onclick="toggleTimer()">INICIAR</button>
-    <button class="btn btn-stop"             onclick="resetAll()">RESET</button>
-  </div>
-  <div class="g12"></div>
-
-  <div class="interval-wrap">
-    <div class="interval-label">INTERVALO (MIN)</div>
-    <div class="g8"></div>
-    <div class="interval-row">
-      <button class="ibt" onclick="adjInterval(-5)">-</button>
-      <div class="ival" id="ival">25</div>
-      <button class="ibt" onclick="adjInterval(+5)">+</button>
+    <div class="btn-row">
+      <button class="btn btn-go" id="startBtn" onclick="toggleTimer()">INICIAR</button>
+      <button class="btn btn-stop" onclick="resetAll()">RESET</button>
     </div>
+    <div class="g12"></div>
+
+    <div class="interval-wrap">
+      <div class="interval-label">INTERVALO (MIN)</div>
+      <div class="g8"></div>
+      <div class="interval-row">
+        <button class="ibt" onclick="adjInterval(-5)">-</button>
+        <div class="ival" id="ival">25</div>
+        <button class="ibt" onclick="adjInterval(+5)">+</button>
+      </div>
+    </div>
+    <div class="g20"></div>
+    <button class="btn btn-seal" onclick="sealMana()">SELLAR MANA</button>
+
   </div>
+</div>
 
-  <div class="g20"></div>
+<!-- ══════════════  CLARIVIDENTE  ══════════════ -->
+<div class="screen" id="screenClarividente">
+  <div class="habits-ui">
 
-  <!-- Sellar Mana -->
-  <button class="btn btn-seal" onclick="sealMana()">SELLAR MANA</button>
+    <div class="clari-header">
+      <div class="title" style="color:#AA88FF;text-shadow:0 0 10px rgba(170,136,255,0.40);">✦ CLARIVIDENTE ✦</div>
+      <div class="clari-sealed">MANA SELLADO TOTAL: <span id="clariSealedDisplay">0</span></div>
+    </div>
 
+    <div class="g16"></div>
+    <div class="divider"></div>
+    <div class="g16"></div>
+
+    <button class="btn-new-habit" onclick="openNewHabitModal()">+ NUEVO HÁBITO</button>
+
+    <div class="g16"></div>
+    <div class="habit-list" id="habitList"></div>
+    <div class="g24"></div>
+
+  </div>
+</div>
+
+<!-- ══════════════  BOTTOM NAV  ══════════════ -->
+<div class="bottom-nav">
+  <button class="nav-tab active" id="tabCatalizador" onclick="switchTab('Catalizador')">
+    <span class="nav-icon">◈</span>
+    CATALIZADOR
+  </button>
+  <button class="nav-tab" id="tabClarividente" onclick="switchTab('Clarividente')">
+    <span class="nav-icon">⟡</span>
+    CLARIVIDENTE
+  </button>
 </div>
 
 <div class="flash-layer" id="flashLayer"></div>
@@ -456,9 +483,72 @@
   </div>
 </div>
 
+<!-- ══════════════  NEW HABIT MODAL  ══════════════ -->
+<div class="modal-overlay hidden" id="newHabitModal">
+  <div class="modal-box purple">
+    <div class="modal-title purple">NUEVO HÁBITO</div>
+    <div class="habit-form-modal">
+      <input class="habit-input" id="habitNameInput" type="text" placeholder="NOMBRE DEL HÁBITO" maxlength="28" autocomplete="off" spellcheck="false">
+      <div class="freq-label">FRECUENCIA</div>
+      <div class="freq-row" id="freqRow">
+        <button class="freq-btn selected" data-hours="2"  onclick="selectFreq(this)">2H</button>
+        <button class="freq-btn"          data-hours="6"  onclick="selectFreq(this)">6H</button>
+        <button class="freq-btn"          data-hours="12" onclick="selectFreq(this)">12H</button>
+        <button class="freq-btn"          data-hours="24" onclick="selectFreq(this)">24H</button>
+      </div>
+      <button class="btn-purple" onclick="addHabit()">+ CREAR HÁBITO</button>
+      <button class="modal-cancel" onclick="closeNewHabitModal()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════  DELETE CONFIRM MODAL  ══════════════ -->
+<div class="modal-overlay hidden" id="deleteHabitModal">
+  <div class="modal-box" style="border-color:rgba(255,80,80,0.35);box-shadow:0 0 48px rgba(255,80,80,0.07),inset 0 0 24px rgba(0,0,0,0.6);">
+    <div class="modal-title" style="color:#FF6677;text-shadow:0 0 10px rgba(255,80,100,0.50);">¿ELIMINAR HÁBITO?</div>
+    <div class="modal-text">
+      Esta acción eliminará el hábito y su racha.<br><br>
+      <span style="color:#44FFCC;">El mana que ya sellaste no se perderá.</span><br><br>
+      El mana pendiente sin sellar sí se descartará.
+    </div>
+    <button class="btn-modal" style="color:#FF6677;border-color:#FF6677;box-shadow:0 0 10px rgba(255,80,100,0.18),inset 0 0 10px rgba(255,80,100,0.04);" onclick="confirmDeleteHabit()">SÍ, ELIMINAR</button>
+    <div class="g8"></div>
+    <button class="modal-cancel" onclick="closeDeleteHabitModal()">CANCELAR</button>
+  </div>
+</div>
+
+<!-- ══════════════  EDIT HABIT MODAL  ══════════════ -->
+<div class="modal-overlay hidden" id="editHabitModal">
+  <div class="modal-box purple">
+    <div class="modal-title purple">EDITAR HÁBITO</div>
+    <div class="habit-form-modal">
+      <input class="habit-input" id="editHabitNameInput" type="text" maxlength="28" autocomplete="off" spellcheck="false">
+      <div class="freq-label">FRECUENCIA</div>
+      <div class="freq-row" id="editFreqRow">
+        <button class="freq-btn" data-hours="2"  onclick="selectEditFreq(this)">2H</button>
+        <button class="freq-btn" data-hours="6"  onclick="selectEditFreq(this)">6H</button>
+        <button class="freq-btn" data-hours="12" onclick="selectEditFreq(this)">12H</button>
+        <button class="freq-btn" data-hours="24" onclick="selectEditFreq(this)">24H</button>
+      </div>
+      <button class="btn-purple" onclick="saveEditHabit()">GUARDAR</button>
+      <button class="modal-cancel" onclick="closeEditHabitModal()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════════
-//  MANA TIERS
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen' + name).classList.add('active');
+  document.getElementById('tab' + name).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CONSTANTS
 // ═══════════════════════════════════════════════════════════
 const TIER_CLASSES = ['', 't1', 't2', 't3', 't4', 't5'];
 const PIP_COLORS   = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#CCCCFF'];
@@ -466,56 +556,27 @@ const GEM_COLORS   = ['#44FFCC', '#22FFEE', '#FFD700', '#FF7766', '#FF88CC', '#D
 const FLASH_COLORS = ['#44FFCC', '#00FFEE', '#FFD700', '#FF7766', '#FF88CC', '#EEEEFF'];
 
 // ═══════════════════════════════════════════════════════════
-//  STATE
+//  POMODORO STATE
 // ═══════════════════════════════════════════════════════════
-const S = {
-  mana:       0,
-  sealedMana: 0,
-  interval:   25,
-  remaining:  25 * 60,
-  total:      25 * 60,
-  running:    false,
-  warnedAt60: false,
-};
+const S = { mana: 0, sealedMana: 0, interval: 25, remaining: 25*60, total: 25*60, running: false, warnedAt60: false };
 let timerId  = null;
 let hiddenAt = null;
 
-function tier() {
-  return Math.min(Math.floor(S.mana / 5), TIER_CLASSES.length - 1);
-}
+function tier() { return Math.min(Math.floor(S.mana / 5), TIER_CLASSES.length - 1); }
+function getManaReward() { return S.interval >= 30 ? 3 : S.interval >= 20 ? 2 : 1; }
 
-// Mana earned per pomodoro based on duration
-function getManaReward() {
-  if (S.interval >= 30) return 3;
-  if (S.interval >= 20) return 2;
-  return 1; // 1–19 min
-}
-
-// ── Persistence ──────────────────────────────────────────
 function saveState() {
-  try {
-    localStorage.setItem('pomodoro_state', JSON.stringify({
-      mana:       S.mana,
-      sealedMana: S.sealedMana,
-      interval:   S.interval,
-    }));
-  } catch(e) {}
+  try { localStorage.setItem('pomodoro_state', JSON.stringify({ mana: S.mana, sealedMana: S.sealedMana, interval: S.interval })); } catch(e) {}
 }
-
 function loadState() {
   try {
     const d = JSON.parse(localStorage.getItem('pomodoro_state') || '{}');
     if (typeof d.mana       === 'number') S.mana       = d.mana;
     if (typeof d.sealedMana === 'number') S.sealedMana = d.sealedMana;
-    if (typeof d.interval   === 'number') {
-      S.interval  = Math.max(1, Math.min(90, d.interval));
-      S.remaining = S.interval * 60;
-      S.total     = S.remaining;
-    }
+    if (typeof d.interval   === 'number') { S.interval = Math.max(1, Math.min(90, d.interval)); S.remaining = S.interval*60; S.total = S.remaining; }
   } catch(e) {}
 }
 
-// ── Seal session mana ────────────────────────────────────
 function sealMana() {
   if (S.mana === 0) return;
   S.sealedMana += S.mana;
@@ -524,6 +585,229 @@ function sealMana() {
   playSealSound();
   refreshMana();
   refreshProgress();
+  refreshClariSealed();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HABITS STATE
+// ═══════════════════════════════════════════════════════════
+let habits = [];
+let selectedFreqHours     = 2;
+let selectedEditFreqHours = 2;
+let editingHabitId        = null;
+let habitsTimerId         = null;
+
+function habitManaRate(streak) { return streak >= 30 ? 3 : streak >= 20 ? 2 : 1; }
+
+function saveHabits() { try { localStorage.setItem('habits_state', JSON.stringify(habits)); } catch(e) {} }
+function loadHabits() { try { const d = JSON.parse(localStorage.getItem('habits_state') || '[]'); if (Array.isArray(d)) habits = d; } catch(e) {} }
+
+// Pending habit mana (earned but not sealed)
+function totalPendingHabitMana() { return habits.reduce((s, h) => s + (h.pendingMana || 0), 0); }
+
+function selectFreq(btn) {
+  document.querySelectorAll('#freqRow .freq-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedFreqHours = parseInt(btn.dataset.hours);
+}
+function selectEditFreq(btn) {
+  document.querySelectorAll('#editFreqRow .freq-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedEditFreqHours = parseInt(btn.dataset.hours);
+}
+
+// Modals
+function openNewHabitModal() {
+  document.getElementById('habitNameInput').value = '';
+  document.getElementById('newHabitModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('habitNameInput').focus(), 100);
+}
+function closeNewHabitModal() { document.getElementById('newHabitModal').classList.add('hidden'); }
+
+function openEditHabitModal(id) {
+  const h = habits.find(x => x.id === id);
+  if (!h) return;
+  editingHabitId = id;
+  document.getElementById('editHabitNameInput').value = h.name;
+  // Pre-select frequency
+  document.querySelectorAll('#editFreqRow .freq-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.hours) === h.hours);
+  });
+  selectedEditFreqHours = h.hours;
+  document.getElementById('editHabitModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('editHabitNameInput').focus(), 100);
+}
+function closeEditHabitModal() { document.getElementById('editHabitModal').classList.add('hidden'); editingHabitId = null; }
+
+function saveEditHabit() {
+  if (!editingHabitId) return;
+  const h = habits.find(x => x.id === editingHabitId);
+  if (!h) return;
+  const newName = document.getElementById('editHabitNameInput').value.trim().toUpperCase();
+  if (!newName) { document.getElementById('editHabitNameInput').focus(); return; }
+  h.name  = newName;
+  h.hours = selectedEditFreqHours;
+  saveHabits();
+  renderHabits();
+  closeEditHabitModal();
+}
+
+function addHabit() {
+  const input = document.getElementById('habitNameInput');
+  const name  = input.value.trim().toUpperCase();
+  if (!name) { input.focus(); return; }
+  const now = Date.now();
+  habits.push({ id: now, name, hours: selectedFreqHours, streak: 0, completedAt: null, deadlineAt: now + selectedFreqHours*3600*1000, done: false, pendingMana: 0 });
+  saveHabits();
+  renderHabits();
+  closeNewHabitModal();
+  playHabitCreatedSound();
+}
+
+function completeHabit(id) {
+  const h = habits.find(x => x.id === id);
+  if (!h || h.done) return;
+  const now = Date.now();
+  h.done = true; h.completedAt = now;
+  h.deadlineAt = now + h.hours*3600*1000;
+  h.streak++;
+  const mana = habitManaRate(h.streak);
+  h.pendingMana = (h.pendingMana || 0) + mana;
+  saveHabits();
+  renderHabits();
+  showHabitFlash(mana, h.streak);
+  playHabitCompleteSound();
+}
+
+function sealHabitMana(id) {
+  const h = habits.find(x => x.id === id);
+  if (!h || !h.pendingMana) return;
+  S.sealedMana += h.pendingMana;
+  h.pendingMana = 0;
+  saveState();
+  saveHabits();
+  refreshMana();
+  refreshClariSealed();
+  renderHabits();
+  playSealSound();
+  showSealFlash(h.pendingMana || 0); // already 0 — show from local calc above handled inside
+}
+
+function sealHabitManaById(id) {
+  const h = habits.find(x => x.id === id);
+  if (!h || !h.pendingMana) return;
+  const amount = h.pendingMana;
+  S.sealedMana += amount;
+  h.pendingMana = 0;
+  saveState();
+  saveHabits();
+  refreshMana();
+  refreshClariSealed();
+  renderHabits();
+  playSealSound();
+  showSealFlashAmount(amount);
+}
+
+let deletingHabitId = null;
+
+function deleteHabit(id) {
+  deletingHabitId = id;
+  document.getElementById('deleteHabitModal').classList.remove('hidden');
+}
+function closeDeleteHabitModal() {
+  document.getElementById('deleteHabitModal').classList.add('hidden');
+  deletingHabitId = null;
+}
+function confirmDeleteHabit() {
+  if (!deletingHabitId) return;
+  habits = habits.filter(x => x.id !== deletingHabitId);
+  saveHabits();
+  renderHabits();
+  closeDeleteHabitModal();
+}
+
+function tickHabits() {
+  const now = Date.now();
+  let changed = false;
+  habits.forEach(h => {
+    if (!h.done && now >= h.deadlineAt) {
+      if (h.streak > 0) { h.streak = 0; changed = true; }
+      h.deadlineAt = now + h.hours*3600*1000;
+      changed = true;
+    }
+    if (h.done && now >= h.deadlineAt) { h.done = false; changed = true; }
+  });
+  if (changed) saveHabits();
+  renderHabits();
+}
+
+function refreshClariSealed() {
+  const el = document.getElementById('clariSealedDisplay');
+  if (el) el.textContent = S.sealedMana;
+}
+
+function renderHabits() {
+  const list = document.getElementById('habitList');
+  if (!list) return;
+  const now = Date.now();
+
+  if (habits.length === 0) {
+    list.innerHTML = '<div style="font-size:6px;color:#3A3560;text-align:center;letter-spacing:1px;line-height:2.5;">NO HAY HÁBITOS AÚN.<br>CREA UNO ARRIBA.</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  habits.forEach(h => {
+    const remaining = Math.max(0, h.deadlineAt - now);
+    const totalMs   = h.hours * 3600 * 1000;
+    const pct       = h.done ? 100 : Math.round((1 - remaining / totalMs) * 100);
+    const hrs       = Math.floor(remaining / 3600000);
+    const mins      = Math.floor((remaining % 3600000) / 60000);
+    const secs      = Math.floor((remaining % 60000) / 1000);
+    const timeStr   = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    const manaRate  = habitManaRate(h.streak);
+    const pctLeft   = remaining / totalMs;
+    const isUrgent   = !h.done && pctLeft < 0.25 && pctLeft > 0;
+    const isCritical = !h.done && pctLeft < 0.10 && pctLeft > 0;
+    const pending    = h.pendingMana || 0;
+
+    let cardClass = 'habit-card';
+    if (h.done) cardClass += ' done';
+
+    let cdClass = 'habit-countdown';
+    if (isCritical) cdClass += ' critical';
+    else if (isUrgent) cdClass += ' urgent';
+
+    const btnLabel = h.done ? '✦ COMPLETADO' : 'MARCAR COMPLETO';
+    const btnClass = 'btn-complete' + (h.done ? ' done-state' : '');
+    const manaStars = '◆'.repeat(manaRate);
+    const sealDisabled = pending === 0 ? 'disabled' : '';
+
+    const card = document.createElement('div');
+    card.className = cardClass;
+    card.innerHTML = `
+      <div class="habit-top">
+        <div class="habit-name">${h.name}</div>
+        <div class="habit-actions">
+          <button class="habit-action-btn edit" onclick="openEditHabitModal(${h.id})">✎</button>
+          <button class="habit-action-btn del"  onclick="deleteHabit(${h.id})">✕</button>
+        </div>
+      </div>
+      <div class="habit-meta">
+        <div class="habit-streak">RACHA: <span class="streak-val">${h.streak}</span></div>
+        <div class="habit-mana-rate">${manaStars} ${manaRate} MANA</div>
+      </div>
+      <div class="habit-bar-bg"><div class="habit-bar-fill" style="width:${pct}%"></div></div>
+      <div class="${cdClass}">${h.done ? 'PRÓXIMO CICLO: ' + timeStr : timeStr}</div>
+      <div class="habit-btn-row">
+        <button class="${btnClass}" onclick="completeHabit(${h.id})" ${h.done ? 'disabled' : ''}>${btnLabel}</button>
+        <button class="btn-habit-seal" onclick="sealHabitManaById(${h.id})" ${sealDisabled}>
+          ${pending > 0 ? `SELLAR +${pending}` : 'SELLAR MANA'}
+        </button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -531,357 +815,227 @@ function sealMana() {
 // ═══════════════════════════════════════════════════════════
 const SC  = document.getElementById('stars');
 const SCX = SC.getContext('2d');
-let stars  = [];
-let lastTs = 0;
+let stars = [], lastTs = 0;
 
 function initStars() {
-  SC.width  = window.innerWidth;
-  SC.height = window.innerHeight;
+  SC.width = window.innerWidth; SC.height = window.innerHeight;
   stars = Array.from({ length: 75 }, () => ({
-    x:    Math.random() * SC.width,
-    y:    Math.random() * SC.height * 0.88,
-    sz:   Math.random() > 0.88 ? 3 : Math.random() > 0.65 ? 2 : 1,
-    ph:   Math.random() * Math.PI * 2,
-    sp:   0.10 + Math.random() * 0.35,
-    warm: Math.random() > 0.28,
-    flareCd: Math.random() * 14,
-    flare:   0,
+    x: Math.random()*SC.width, y: Math.random()*SC.height*0.88,
+    sz: Math.random()>0.88?3:Math.random()>0.65?2:1,
+    ph: Math.random()*Math.PI*2, sp: 0.10+Math.random()*0.35,
+    warm: Math.random()>0.28, flareCd: Math.random()*14, flare: 0,
   }));
 }
 
 function starsLoop(ts) {
-  const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.1) : 0;
-  lastTs = ts;
+  const dt = lastTs ? Math.min((ts-lastTs)/1000, 0.1) : 0; lastTs = ts;
   SCX.clearRect(0, 0, SC.width, SC.height);
   stars.forEach(s => {
     s.flareCd -= dt;
-    if (s.flareCd <= 0) { s.flare = 1.0; s.flareCd = 6 + Math.random() * 20; }
-    if (s.flare > 0) s.flare = Math.max(0, s.flare - dt * 1.1);
-
-    const baseA  = 0.08 + 0.62 * (0.5 + 0.5 * Math.sin(ts * 0.001 * s.sp + s.ph));
-    const totalA = Math.min(1, baseA + s.flare * 0.92);
-    const { x, y, sz } = s;
-    const isWarm = s.warm;
-
+    if (s.flareCd <= 0) { s.flare = 1.0; s.flareCd = 6+Math.random()*20; }
+    if (s.flare > 0) s.flare = Math.max(0, s.flare - dt*1.1);
+    const baseA  = 0.08 + 0.62*(0.5+0.5*Math.sin(ts*0.001*s.sp+s.ph));
+    const totalA = Math.min(1, baseA+s.flare*0.92);
+    const {x,y,sz} = s;
     if (s.flare > 0.05) {
-      const reach = sz + s.flare * 6;
-      SCX.fillStyle = isWarm
-        ? `rgba(255,230,110,${(s.flare * 0.30).toFixed(2)})`
-        : `rgba(200,230,255,${(s.flare * 0.26).toFixed(2)})`;
-      SCX.fillRect(x - reach * 2.5, y, reach * 5 + 1, 1);
-      SCX.fillRect(x, y - reach * 2.5, 1, reach * 5 + 1);
+      const reach = sz+s.flare*6;
+      SCX.fillStyle = s.warm?`rgba(255,230,110,${(s.flare*0.30).toFixed(2)})`:`rgba(200,230,255,${(s.flare*0.26).toFixed(2)})`;
+      SCX.fillRect(x-reach*2.5, y, reach*5+1, 1); SCX.fillRect(x, y-reach*2.5, 1, reach*5+1);
     }
-
-    SCX.fillStyle = isWarm
-      ? `rgba(255,215,75,${totalA.toFixed(2)})`
-      : `rgba(210,238,255,${totalA.toFixed(2)})`;
-    if (sz === 1) {
-      SCX.fillRect(x, y, 1, 1);
-    } else {
-      SCX.fillRect(x - sz, y,      sz * 2 + 1, 1);
-      SCX.fillRect(x,      y - sz, 1, sz * 2 + 1);
-    }
-
-    if (s.flare > 0.15) {
-      SCX.fillStyle = isWarm
-        ? `rgba(255,252,220,${(s.flare * 0.95).toFixed(2)})`
-        : `rgba(240,250,255,${(s.flare * 0.95).toFixed(2)})`;
-      SCX.fillRect(x - 1, y - 1, 3, 3);
+    SCX.fillStyle = s.warm?`rgba(255,215,75,${totalA.toFixed(2)})`:`rgba(210,238,255,${totalA.toFixed(2)})`;
+    if (sz===1) { SCX.fillRect(x,y,1,1); } else { SCX.fillRect(x-sz,y,sz*2+1,1); SCX.fillRect(x,y-sz,1,sz*2+1); }
+    if (s.flare>0.15) {
+      SCX.fillStyle = s.warm?`rgba(255,252,220,${(s.flare*0.95).toFixed(2)})`:`rgba(240,250,255,${(s.flare*0.95).toFixed(2)})`;
+      SCX.fillRect(x-1,y-1,3,3);
     }
   });
   requestAnimationFrame(starsLoop);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  RETRO AUDIO
+//  AUDIO
 // ═══════════════════════════════════════════════════════════
 let _audioCtx = null;
 function getAudio() {
-  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  if (!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if (_audioCtx.state==='suspended') _audioCtx.resume();
   return _audioCtx;
 }
-function playNote(ctx, freq, startOffset, dur, vol = 0.28, wave = 'square') {
-  const osc  = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
-  osc.type = wave;
-  osc.frequency.setValueAtTime(freq, ctx.currentTime + startOffset);
-  gain.gain.setValueAtTime(0, ctx.currentTime + startOffset);
-  gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + startOffset + 0.01);
-  gain.gain.setValueAtTime(vol, ctx.currentTime + startOffset + dur - 0.015);
-  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + startOffset + dur);
-  osc.start(ctx.currentTime + startOffset);
-  osc.stop(ctx.currentTime + startOffset + dur + 0.01);
+function playNote(ctx, freq, startOffset, dur, vol=0.28, wave='square') {
+  const osc=ctx.createOscillator(), gain=ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination); osc.type=wave;
+  osc.frequency.setValueAtTime(freq, ctx.currentTime+startOffset);
+  gain.gain.setValueAtTime(0, ctx.currentTime+startOffset);
+  gain.gain.linearRampToValueAtTime(vol, ctx.currentTime+startOffset+0.01);
+  gain.gain.setValueAtTime(vol, ctx.currentTime+startOffset+dur-0.015);
+  gain.gain.linearRampToValueAtTime(0, ctx.currentTime+startOffset+dur);
+  osc.start(ctx.currentTime+startOffset); osc.stop(ctx.currentTime+startOffset+dur+0.01);
 }
-function playWarningSound() {
-  try {
-    const ctx = getAudio();
-    [[880,0.00,0.08],[880,0.13,0.08],[880,0.26,0.08],[587,0.40,0.22]]
-      .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.25));
-  } catch(e) {}
-}
+function playWarningSound() { try { const ctx=getAudio(); [[880,0.00,0.08],[880,0.13,0.08],[880,0.26,0.08],[587,0.40,0.22]].forEach(([f,t,d])=>playNote(ctx,f,t,d,0.25)); } catch(e){} }
 function playMysterySound() {
-  try {
-    const ctx = getAudio();
-    // Deep arcane drone + ascending ethereal tones
-    playNote(ctx, 110,  0.00, 1.4, 0.14, 'sine');     // low bass drone
-    playNote(ctx, 220,  0.15, 1.0, 0.09, 'sine');     // octave
-    playNote(ctx, 277,  0.35, 0.8, 0.07, 'triangle'); // minor third
-    playNote(ctx, 330,  0.55, 0.7, 0.07, 'triangle'); // fifth
-    playNote(ctx, 554,  0.75, 0.9, 0.10, 'sine');     // high ethereal
-    playNote(ctx, 440,  0.90, 0.6, 0.06, 'sine');     // resolve
-  } catch(e) {}
+  try { const ctx=getAudio();
+    playNote(ctx,110,0.00,1.4,0.14,'sine'); playNote(ctx,220,0.15,1.0,0.09,'sine');
+    playNote(ctx,277,0.35,0.8,0.07,'triangle'); playNote(ctx,330,0.55,0.7,0.07,'triangle');
+    playNote(ctx,554,0.75,0.9,0.10,'sine'); playNote(ctx,440,0.90,0.6,0.06,'sine');
+  } catch(e){}
 }
+function playSealSound() { try { const ctx=getAudio(); [[1047,0.00,0.10],[1319,0.12,0.10],[1568,0.24,0.10],[2093,0.36,0.30]].forEach(([f,t,d])=>playNote(ctx,f,t,d,0.20,'triangle')); } catch(e){} }
+function playCompleteSound() { try { const ctx=getAudio(); [[523,0.00,0.11],[659,0.13,0.11],[784,0.26,0.11],[1047,0.40,0.11],[784,0.53,0.08],[1047,0.63,0.35]].forEach(([f,t,d])=>playNote(ctx,f,t,d,0.30)); } catch(e){} }
+function playHabitCompleteSound() { try { const ctx=getAudio(); [[370,0.00,0.10],[466,0.13,0.10],[554,0.26,0.10],[740,0.40,0.28]].forEach(([f,t,d])=>playNote(ctx,f,t,d,0.22,'triangle')); } catch(e){} }
+function playHabitCreatedSound() { try { const ctx=getAudio(); [[330,0.00,0.08],[440,0.10,0.08]].forEach(([f,t,d])=>playNote(ctx,f,t,d,0.15,'triangle')); } catch(e){} }
 
 function closeIntroModal() {
   playMysterySound();
-  const modal = document.getElementById('introModal');
-  modal.style.transition = 'opacity 0.6s ease';
-  modal.style.opacity = '0';
-  setTimeout(() => { modal.style.display = 'none'; }, 620);
-}
-
-function playSealSound() {
-  try {
-    const ctx = getAudio();
-    // Crystal chime — ascending triangle wave, warm and satisfying
-    [[1047,0.00,0.10],[1319,0.12,0.10],[1568,0.24,0.10],[2093,0.36,0.30]]
-      .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.20, 'triangle'));
-  } catch(e) {}
-}
-
-function playCompleteSound() {
-  try {
-    const ctx = getAudio();
-    [[523,0.00,0.11],[659,0.13,0.11],[784,0.26,0.11],
-     [1047,0.40,0.11],[784,0.53,0.08],[1047,0.63,0.35]]
-      .forEach(([f,t,d]) => playNote(ctx, f, t, d, 0.30));
-  } catch(e) {}
+  const m = document.getElementById('introModal');
+  m.style.transition='opacity 0.6s ease'; m.style.opacity='0';
+  setTimeout(()=>{ m.style.display='none'; }, 620);
 }
 
 // ═══════════════════════════════════════════════════════════
 //  TIMER
 // ═══════════════════════════════════════════════════════════
-function fmt(s) {
-  return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
-}
+function fmt(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
 
 function refreshTimer() {
-  const el  = document.getElementById('timer');
-  const pct = S.remaining / S.total;
-  el.textContent = fmt(S.remaining);
-  let cls = 'timer';
-  if      (pct < 0.08) cls += ' tc4';
-  else if (pct < 0.22) cls += ' tc3';
-  else if (pct < 0.40) cls += ' tc2';
-  else if (pct < 0.65) cls += ' tc1';
-  el.className = cls;
+  const el=document.getElementById('timer'), pct=S.remaining/S.total;
+  el.textContent=fmt(S.remaining);
+  let cls='timer';
+  if      (pct<0.08) cls+=' tc4';
+  else if (pct<0.22) cls+=' tc3';
+  else if (pct<0.40) cls+=' tc2';
+  else if (pct<0.65) cls+=' tc1';
+  el.className=cls;
 }
 
-// ── Crystal progress fill ─────────────────────────────────
 function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1,3), 16);
-  const g = parseInt(hex.slice(3,5), 16);
-  const b = parseInt(hex.slice(5,7), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
+  return `rgba(${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)},${alpha})`;
 }
 
 function refreshProgress() {
-  const pct = S.total > 0 ? S.remaining / S.total : 1;
-  // Crystal charges as time passes: pct 1→0 fills rect from y=50 down to y=0
-  const fillRect = document.getElementById('gemFillRect');
-  const fillPoly = document.getElementById('gemFillPoly');
-  if (fillRect) fillRect.setAttribute('y', (50 * pct).toFixed(2));
-  let col;
-  if      (pct < 0.08) col = '#00FF88';
-  else if (pct < 0.22) col = '#FFF0A0';
-  else if (pct < 0.40) col = '#FFCC44';
-  else if (pct < 0.65) col = '#44FFEE';
-  else                 col = '#C0EEFF';
-  if (fillPoly) fillPoly.setAttribute('fill', hexToRgba(col, 0.38));
+  const pct=S.total>0?S.remaining/S.total:1;
+  const fr=document.getElementById('gemFillRect'), fp=document.getElementById('gemFillPoly');
+  if (fr) fr.setAttribute('y',(50*pct).toFixed(2));
+  let col = pct<0.08?'#00FF88':pct<0.22?'#FFF0A0':pct<0.40?'#FFCC44':pct<0.65?'#44FFEE':'#C0EEFF';
+  if (fp) fp.setAttribute('fill', hexToRgba(col, 0.38));
 }
 
 function toggleTimer() { S.running ? pauseTimer() : startTimer(); }
-
 function startTimer() {
-  if (S.remaining <= 0) return;
-  getAudio();
-  S.running = true;
-  document.getElementById('startBtn').textContent = 'PAUSAR';
-  timerId = setInterval(tick, 1000);
+  if (S.remaining<=0) return; getAudio(); S.running=true;
+  document.getElementById('startBtn').textContent='PAUSAR';
+  timerId=setInterval(tick,1000);
 }
-
-function pauseTimer() {
-  clearInterval(timerId);
-  S.running = false;
-  document.getElementById('startBtn').textContent = 'REANUDAR';
-}
+function pauseTimer() { clearInterval(timerId); S.running=false; document.getElementById('startBtn').textContent='REANUDAR'; }
 
 function tick() {
-  if (S.remaining <= 0) return;
-  S.remaining--;
-  refreshTimer();
-  refreshProgress();
-  if (S.remaining === 60 && !S.warnedAt60) {
-    S.warnedAt60 = true;
-    playWarningSound();
-  }
-  if (S.remaining <= 0) completePomodoro();
+  if (S.remaining<=0) return;
+  S.remaining--; refreshTimer(); refreshProgress();
+  if (S.remaining===60&&!S.warnedAt60) { S.warnedAt60=true; playWarningSound(); }
+  if (S.remaining<=0) completePomodoro();
 }
 
 function completePomodoro() {
-  clearInterval(timerId);
-  S.running = false;
-
-  const earned = getManaReward();
-  S.mana += earned;
-  S.warnedAt60 = false;
-
-  saveState();
-  playCompleteSound();
-  refreshMana();
-  showFlash(earned);
-
-  S.remaining = S.interval * 60;
-  S.total     = S.remaining;
-  refreshTimer();
-  refreshProgress();
-  document.getElementById('startBtn').textContent = 'INICIAR';
+  clearInterval(timerId); S.running=false;
+  const earned=getManaReward(); S.mana+=earned; S.warnedAt60=false;
+  saveState(); playCompleteSound(); refreshMana(); showFlash(earned);
+  S.remaining=S.interval*60; S.total=S.remaining;
+  refreshTimer(); refreshProgress();
+  document.getElementById('startBtn').textContent='INICIAR';
 }
 
 function resetAll() {
-  clearInterval(timerId);
-  S.running    = false;
-  S.mana       = 0;
-  S.warnedAt60 = false;
-  S.remaining  = S.interval * 60;
-  S.total      = S.remaining;
-  saveState();
-  refreshTimer();
-  refreshProgress();
-  refreshMana();
-  document.getElementById('startBtn').textContent = 'INICIAR';
+  clearInterval(timerId); S.running=false; S.mana=0; S.warnedAt60=false;
+  S.remaining=S.interval*60; S.total=S.remaining;
+  saveState(); refreshTimer(); refreshProgress(); refreshMana();
+  document.getElementById('startBtn').textContent='INICIAR';
 }
 
 // ═══════════════════════════════════════════════════════════
 //  MANA DISPLAY
 // ═══════════════════════════════════════════════════════════
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return `${r},${g},${b}`;
-}
+function hexToRgb(hex) { return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`; }
 
 function refreshMana() {
-  const t   = tier();
-  const col = GEM_COLORS[t];
-
-  const num = document.getElementById('manaNum');
-  num.textContent = S.mana;
-  num.className   = 'mana-num ' + (TIER_CLASSES[t] || '');
-
-  // Recolor crystal (skip progress fill polygon)
-  const gem = document.getElementById('gemIcon');
-  gem.querySelectorAll('polygon, line').forEach(el => {
-    if (el.id === 'gemFillPoly') return;
+  const t=tier(), col=GEM_COLORS[t];
+  const num=document.getElementById('manaNum');
+  num.textContent=S.mana; num.className='mana-num '+(TIER_CLASSES[t]||'');
+  const gem=document.getElementById('gemIcon');
+  gem.querySelectorAll('polygon, line').forEach(el=>{
+    if (el.id==='gemFillPoly') return;
     if (el.getAttribute('stroke')) el.setAttribute('stroke', col);
-    const f = el.getAttribute('fill');
-    if (f && f !== 'none' && f.startsWith('rgba')) {
-      el.setAttribute('fill', f.replace(/[\d.]+,[\d.]+,[\d.]+/, hexToRgb(col)));
-    }
+    const f=el.getAttribute('fill');
+    if (f&&f!=='none'&&f.startsWith('rgba')) el.setAttribute('fill', f.replace(/[\d.]+,[\d.]+,[\d.]+/, hexToRgb(col)));
   });
-
-  // Sealed mana
-  const sealedEl = document.getElementById('sealedManaDisplay');
-  if (sealedEl) sealedEl.textContent = S.sealedMana;
-
-  // Session mana text
-  document.getElementById('streak').textContent = `MANA RECOLECTADO: ${S.mana}`;
-
-  // Pips (up to 25)
-  const pipsEl = document.getElementById('pips');
-  pipsEl.innerHTML = '';
-  const show = Math.min(S.mana, 25);
-  for (let i = 0; i < show; i++) {
-    const pt  = Math.min(Math.floor(i / 5), PIP_COLORS.length - 1);
-    const div = document.createElement('div');
-    div.className = 'pip on';
-    div.style.setProperty('--pc', PIP_COLORS[pt]);
-    pipsEl.appendChild(div);
+  const sealedEl=document.getElementById('sealedManaDisplay');
+  if (sealedEl) sealedEl.textContent=S.sealedMana;
+  document.getElementById('streak').textContent=`MANA RECOLECTADO: ${S.mana}`;
+  const pipsEl=document.getElementById('pips'); pipsEl.innerHTML='';
+  const show=Math.min(S.mana,25);
+  for (let i=0;i<show;i++) {
+    const pt=Math.min(Math.floor(i/5),PIP_COLORS.length-1);
+    const div=document.createElement('div'); div.className='pip on';
+    div.style.setProperty('--pc', PIP_COLORS[pt]); pipsEl.appendChild(div);
   }
-  if (S.mana > 25) {
-    const ex = document.createElement('div');
-    ex.className   = 'pip-extra';
-    ex.textContent = `+${S.mana - 25}`;
-    pipsEl.appendChild(ex);
-  }
+  if (S.mana>25) { const ex=document.createElement('div'); ex.className='pip-extra'; ex.textContent=`+${S.mana-25}`; pipsEl.appendChild(ex); }
+  refreshClariSealed();
 }
 
 // ═══════════════════════════════════════════════════════════
-//  COMPLETION FLASH
+//  FLASH
 // ═══════════════════════════════════════════════════════════
 function showFlash(earned) {
-  const col   = FLASH_COLORS[tier()];
-  const layer = document.getElementById('flashLayer');
-  layer.innerHTML = `
-    <div class="flash-msg" style="border-color:${col};color:${col};text-shadow:0 0 16px ${col}">
-      +${earned} MANA
-      <div style="font-size:8px;color:#44FF88;text-shadow:0 0 8px #44FF88">✦ COMPLETO ✦</div>
-    </div>`;
-  layer.style.display = 'flex';
-  setTimeout(() => { layer.style.display = 'none'; layer.innerHTML = ''; }, 2800);
+  const col=FLASH_COLORS[tier()], layer=document.getElementById('flashLayer');
+  layer.innerHTML=`<div class="flash-msg" style="border-color:${col};color:${col};text-shadow:0 0 16px ${col}">+${earned} MANA<div style="font-size:8px;color:#44FF88;text-shadow:0 0 8px #44FF88">✦ COMPLETO ✦</div></div>`;
+  layer.style.display='flex'; setTimeout(()=>{ layer.style.display='none'; layer.innerHTML=''; }, 2800);
+}
+function showHabitFlash(mana, streak) {
+  const layer=document.getElementById('flashLayer');
+  layer.innerHTML=`<div class="flash-msg" style="border-color:#AA88FF;color:#AA88FF;text-shadow:0 0 16px #AA88FF">+${mana} MANA<div style="font-size:8px;color:#FFCC44;text-shadow:0 0 8px rgba(255,200,60,0.6)">RACHA: ${streak}</div></div>`;
+  layer.style.display='flex'; setTimeout(()=>{ layer.style.display='none'; layer.innerHTML=''; }, 2800);
+}
+function showSealFlashAmount(amount) {
+  const layer=document.getElementById('flashLayer');
+  layer.innerHTML=`<div class="flash-msg" style="border-color:#88CCFF;color:#88CCFF;text-shadow:0 0 16px #88CCFF">+${amount} SELLADO<div style="font-size:8px;color:#44FFCC;text-shadow:0 0 8px #44FFCC">✦ MANA CRISTALIZADO ✦</div></div>`;
+  layer.style.display='flex'; setTimeout(()=>{ layer.style.display='none'; layer.innerHTML=''; }, 2800);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  INTERVAL CONTROL
+//  INTERVAL
 // ═══════════════════════════════════════════════════════════
 function adjInterval(d) {
   if (S.running) return;
-  S.interval  = Math.max(1, Math.min(90, S.interval + d));
-  S.remaining = S.interval * 60;
-  S.total     = S.remaining;
-  document.getElementById('ival').textContent = S.interval;
-  saveState();
-  refreshTimer();
-  refreshProgress();
+  S.interval=Math.max(1, Math.min(90, S.interval+d));
+  S.remaining=S.interval*60; S.total=S.remaining;
+  document.getElementById('ival').textContent=S.interval;
+  saveState(); refreshTimer(); refreshProgress();
 }
 
 // ═══════════════════════════════════════════════════════════
-//  VISIBILITY — catch up lost time
+//  VISIBILITY
 // ═══════════════════════════════════════════════════════════
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    hiddenAt = Date.now();
-  } else if (hiddenAt && S.running) {
-    const lost = Math.floor((Date.now() - hiddenAt) / 1000);
-    S.remaining = Math.max(0, S.remaining - lost);
-    refreshTimer();
-    refreshProgress();
-    if (S.remaining === 0) completePomodoro();
-    hiddenAt = null;
+  if (document.hidden) { hiddenAt=Date.now(); }
+  else if (hiddenAt&&S.running) {
+    const lost=Math.floor((Date.now()-hiddenAt)/1000);
+    S.remaining=Math.max(0, S.remaining-lost);
+    refreshTimer(); refreshProgress();
+    if (S.remaining===0) completePomodoro();
+    hiddenAt=null;
   }
+  if (!document.hidden) renderHabits();
 });
 
 // ═══════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('load', () => {
-  loadState();
-  document.getElementById('ival').textContent = S.interval;
-  initStars();
-  requestAnimationFrame(starsLoop);
-  refreshTimer();
-  refreshProgress();
-  refreshMana();
+  loadState(); loadHabits();
+  document.getElementById('ival').textContent=S.interval;
+  initStars(); requestAnimationFrame(starsLoop);
+  refreshTimer(); refreshProgress(); refreshMana(); renderHabits();
+  habitsTimerId=setInterval(tickHabits, 1000);
 });
-
-window.addEventListener('resize', () => {
-  SC.width  = window.innerWidth;
-  SC.height = window.innerHeight;
-  initStars();
-});
+window.addEventListener('resize', () => { SC.width=window.innerWidth; SC.height=window.innerHeight; initStars(); });
 </script>
 </body>
 </html>
