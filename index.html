@@ -345,6 +345,81 @@
     .btn-habit-seal:active { opacity: .7; }
     .btn-habit-seal:disabled { opacity: 0.3; cursor: default; }
 
+    .btn-ignore {
+      font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 9px;
+      background: transparent; border: 1px solid rgba(255,80,80,0.30); color: #AA5566;
+      cursor: pointer; flex: 1; border-radius: 2px; letter-spacing: 1px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-ignore:active { opacity: .7; }
+
+    /* Clarividente habit-expiry alert overlay */
+    #clariAlertOverlay {
+      position: fixed; inset: 0;
+      bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+      z-index: 15;
+      background: rgba(3,5,18,0.93);
+      display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 28px;
+      animation: modalIn 0.35s ease-out;
+    }
+    .clari-alert-box {
+      border: 2px solid rgba(170,100,255,0.40);
+      background: rgba(6,9,26,0.99);
+      padding: 28px 22px; max-width: 310px; width: 100%;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      box-shadow: 0 0 48px rgba(170,100,255,0.10), inset 0 0 24px rgba(0,0,0,0.6);
+    }
+    .clari-alert-title { font-size: 6px; color: #FFCC44; letter-spacing: 2px; text-align: center; text-shadow: 0 0 8px rgba(255,200,60,0.5); }
+    .clari-alert-name  { font-size: 8px; color: #CCBBFF; letter-spacing: 1px; text-align: center; line-height: 1.8; }
+    .clari-alert-sub   { font-size: 5px; color: #6655AA; letter-spacing: 1px; text-align: center; }
+    .clari-alert-btns  { display: flex; gap: 10px; width: 100%; }
+    .btn-alert-complete {
+      font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 11px 6px;
+      background: transparent; border: 2px solid rgba(170,100,255,0.60); color: #AA88FF;
+      cursor: pointer; flex: 1; border-radius: 3px; letter-spacing: 1px;
+      box-shadow: 0 0 10px rgba(170,136,255,0.15); -webkit-tap-highlight-color: transparent;
+    }
+    .btn-alert-complete:active { opacity: .7; }
+    .btn-alert-ignore {
+      font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 11px 6px;
+      background: transparent; border: 1px solid rgba(255,80,80,0.35); color: #AA5566;
+      cursor: pointer; flex: 1; border-radius: 3px; letter-spacing: 1px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-alert-ignore:active { opacity: .7; }
+
+    .btn-seal-clari {
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      padding: 12px; background: transparent;
+      border: 2px solid #88CCFF; color: #88CCFF;
+      cursor: pointer; width: 100%; max-width: 350px; border-radius: 3px;
+      letter-spacing: 1px; box-shadow: 0 0 10px rgba(136,204,255,0.18);
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+    }
+    .btn-seal-clari:active { transform: translateY(2px); opacity: .8; }
+
+    /* Habit history grid */
+    .hist-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+      width: 100%; max-width: 260px; margin: 0 auto;
+    }
+    .hist-day-label { font-size: 4px; color: #446688; text-align: center; letter-spacing: 0; }
+    .hist-cell {
+      width: 100%; aspect-ratio: 1; border-radius: 2px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    }
+    .hist-cell.done {
+      background: #7755CC;
+      box-shadow: 0 0 4px rgba(120,80,200,0.6);
+      border-color: transparent;
+    }
+    .hist-habit-name { font-size: 7px; color: #CCBBFF; letter-spacing: 1px; text-align: center; line-height: 1.8; }
+    .hist-streak-info { font-size: 6px; color: #9977FF; letter-spacing: 1px; text-align: center; }
+    .hist-streak-info span { color: #FFCC44; }
+
     /* Edit modal extras */
     .modal-form-row { display: flex; flex-direction: column; gap: 10px; width: 100%; }
     .modal-cancel {
@@ -701,8 +776,23 @@
 
     <div class="g16"></div>
     <div class="habit-list" id="habitList"></div>
+    <div class="g16"></div>
+    <button class="btn-seal-clari" id="btnSealClari" onclick="sealAllHabitMana(this)">SELLAR MANA</button>
     <div class="g24"></div>
 
+  </div>
+</div>
+
+<!-- ══════════════  HABIT EXPIRY ALERT  ══════════════ -->
+<div id="clariAlertOverlay">
+  <div class="clari-alert-box">
+    <div class="clari-alert-title">⏰ TIEMPO CUMPLIDO</div>
+    <div class="clari-alert-name" id="alertHabitName">HÁBITO</div>
+    <div class="clari-alert-sub">¿Cumplirás con tu hábito?</div>
+    <div class="clari-alert-btns">
+      <button class="btn-alert-complete" onclick="handleAlertComplete()">MARCAR COMPLETA</button>
+      <button class="btn-alert-ignore"   onclick="handleAlertIgnore()">IGNORAR</button>
+    </div>
   </div>
 </div>
 
@@ -748,15 +838,16 @@
 
 <div class="flash-layer" id="flashLayer"></div>
 
-<!-- ══════════════  INTRO MODAL  ══════════════ -->
-<div class="modal-overlay" id="introModal">
-  <div class="modal-box">
-    <div class="modal-title">Un gusto verte</div>
-    <div class="modal-text">
-      Utiliza el poder de tu concentración para canalizar y recolectar mana.<br><br>
-      Recuerda siempre sellar el mana recolectado al finalizar tu sesión.
-    </div>
-    <button class="btn-modal" onclick="closeIntroModal()">MI MENTE ESTÁ LISTA</button>
+<!-- ══════════════  HABIT HISTORY MODAL  ══════════════ -->
+<div class="modal-overlay hidden" id="habitHistoryModal">
+  <div class="modal-box purple">
+    <div class="hist-habit-name" id="histHabitName">HÁBITO</div>
+    <div class="g8"></div>
+    <div class="hist-streak-info">RACHA ACTUAL: <span id="histStreak">0</span></div>
+    <div class="g16"></div>
+    <div class="hist-grid" id="histGrid"></div>
+    <div class="g16"></div>
+    <button class="modal-cancel" onclick="closeHabitHistoryModal()">CERRAR</button>
   </div>
 </div>
 
@@ -890,6 +981,8 @@ function switchTab(name) {
   const dark = document.getElementById('incuDarkness');
   if (name === 'Incubadora') { dark.classList.add('active'); setTimeout(renderAllJarStars, 80); }
   else dark.classList.remove('active');
+  if (name === 'Clarividente') { renderHabits(); checkClariAlerts(); }
+  else hideClariAlertOverlay();
   if (name === 'Misiones') renderMissions();
 }
 
@@ -1017,15 +1110,80 @@ function completeHabit(id) {
   if (!h) return;
   const now = Date.now();
   h.done = true; h.completedAt = now;
-  // Reinicia el countdown solo si tiene frecuencia definida
   if (h.hours > 0) h.deadlineAt = now + h.hours * 3600 * 1000;
   h.streak++;
   const mana = habitManaRate(h.streak);
   h.pendingMana = (h.pendingMana || 0) + mana;
-  saveHabits();
-  renderHabits();
-  showHabitFlash(mana, h.streak);
-  playHabitCompleteSound();
+  // Track completion date for history grid
+  const dateStr = new Date().toISOString().split('T')[0];
+  if (!h.completedDates) h.completedDates = [];
+  if (!h.completedDates.includes(dateStr)) h.completedDates.push(dateStr);
+  saveHabits(); renderHabits();
+  showHabitFlash(mana, h.streak); playHabitCompleteSound();
+}
+
+function ignoreHabit(id) {
+  const h = habits.find(x => x.id === id);
+  if (!h) return;
+  const now = Date.now();
+  h.streak = 0;
+  h.done = false;
+  if (h.hours > 0) h.deadlineAt = now + h.hours * 3600 * 1000;
+  saveHabits(); renderHabits();
+  playIgnoreSound();
+}
+
+function playIgnoreSound() {
+  try {
+    const ctx = getAudio();
+    [[440,0.00,0.14,'sine'],[349,0.16,0.16,'sine'],[277,0.34,0.18,'sine'],[196,0.54,0.35,'sine']]
+      .forEach(([f,t,d,w])=>playNote(ctx,f,t,d,0.15,w));
+  } catch(e) {}
+}
+
+// ── Habit history modal ───────────────────────────────────
+function openHabitHistory(id) {
+  const h = habits.find(x => x.id === id); if(!h) return;
+  document.getElementById('histHabitName').textContent = h.name;
+  document.getElementById('histStreak').textContent    = h.streak;
+  const dates = h.completedDates || [];
+  const grid  = document.getElementById('histGrid');
+  grid.innerHTML = '';
+  // Day labels Mon→Sun
+  ['L','M','X','J','V','S','D'].forEach(d => {
+    const lbl = document.createElement('div');
+    lbl.className='hist-day-label'; lbl.textContent=d; grid.appendChild(lbl);
+  });
+  // Last 28 days
+  const today = new Date(); today.setHours(0,0,0,0);
+  // Find start: go back to last Monday before 28 days ago
+  const daysBack = 27;
+  const start = new Date(today); start.setDate(start.getDate() - daysBack);
+  // Adjust to previous Monday
+  const dayOfWeek = start.getDay(); // 0=Sun
+  const offset = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+  start.setDate(start.getDate() - offset);
+  // Fill cells
+  const end = new Date(today);
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+    const ds = d.toISOString().split('T')[0];
+    const cell = document.createElement('div');
+    cell.className = 'hist-cell' + (dates.includes(ds) ? ' done' : '');
+    grid.appendChild(cell);
+  }
+  document.getElementById('habitHistoryModal').classList.remove('hidden');
+}
+function closeHabitHistoryModal() { document.getElementById('habitHistoryModal').classList.add('hidden'); }
+
+// ── Seal all habit mana ──────────────────────────────────
+function sealAllHabitMana(btnEl) {
+  const total = habits.reduce((s,h) => s + (h.pendingMana||0), 0);
+  if (total === 0) return;
+  habits.forEach(h => h.pendingMana = 0);
+  S.sealedMana += total;
+  saveState(); saveHabits(); refreshMana(); renderHabits();
+  playSealSound();
+  if (btnEl) animateSealOrbs(btnEl, total);
 }
 
 function sealHabitMana(id) {
@@ -1073,19 +1231,80 @@ function confirmDeleteHabit() {
   closeDeleteHabitModal();
 }
 
+function sendHabitNotif(name) {
+  try {
+    if (Notification.permission === 'granted') {
+      new Notification('⏰ Hora de tu hábito', { body: `Es tiempo de: ${name}`, silent: false });
+    }
+  } catch(e) {}
+}
+
 function tickHabits() {
   const now = Date.now();
   let changed = false;
+  let newAlert = false;
   habits.forEach(h => {
-    if (h.hours === 0) return; // Sin tiempo — nunca expira
-    if (!h.done && now >= h.deadlineAt) {
-      if (h.streak > 0) { h.streak = 0; changed = true; }
-      h.deadlineAt = now + h.hours*3600*1000;
-      changed = true;
+    if (h.hours === 0) return;
+    if (!h.done && now >= h.deadlineAt && !h.awaitingAction) {
+      h.awaitingAction = true;
+      sendHabitNotif(h.name);
+      changed = true; newAlert = true;
     }
   });
   if (changed) saveHabits();
   renderHabits();
+  // Show alert if Clarividente is active and new alert arrived
+  if (newAlert) {
+    const active = document.querySelector('.screen.active');
+    if (active && active.id === 'screenClarividente') checkClariAlerts();
+  }
+}
+
+// ── Clarividente alert overlay ────────────────────────────
+let currentAlertId = null;
+
+function checkClariAlerts() {
+  const pending = habits.filter(h => h.awaitingAction);
+  if (!pending.length) { hideClariAlertOverlay(); return; }
+  currentAlertId = pending[0].id;
+  document.getElementById('alertHabitName').textContent = pending[0].name;
+  document.getElementById('clariAlertOverlay').style.display = 'flex';
+}
+function hideClariAlertOverlay() {
+  document.getElementById('clariAlertOverlay').style.display = 'none';
+  currentAlertId = null;
+}
+function handleAlertComplete() {
+  if (!currentAlertId) return;
+  const h = habits.find(x => x.id === currentAlertId);
+  if (h) {
+    const now = Date.now();
+    h.awaitingAction = false; h.done = true; h.completedAt = now;
+    if (h.hours > 0) h.deadlineAt = now + h.hours * 3600 * 1000;
+    h.streak++;
+    const mana = habitManaRate(h.streak);
+    h.pendingMana = (h.pendingMana || 0) + mana;
+    const ds = new Date().toISOString().split('T')[0];
+    if (!h.completedDates) h.completedDates = [];
+    if (!h.completedDates.includes(ds)) h.completedDates.push(ds);
+    saveHabits(); showHabitFlash(mana, h.streak); playHabitCompleteSound();
+  }
+  currentAlertId = null;
+  renderHabits();
+  checkClariAlerts(); // show next if any
+}
+function handleAlertIgnore() {
+  if (!currentAlertId) return;
+  const h = habits.find(x => x.id === currentAlertId);
+  if (h) {
+    const now = Date.now();
+    h.awaitingAction = false; h.streak = 0; h.done = false;
+    if (h.hours > 0) h.deadlineAt = now + h.hours * 3600 * 1000;
+    saveHabits(); playIgnoreSound();
+  }
+  currentAlertId = null;
+  renderHabits();
+  checkClariAlerts(); // show next if any
 }
 
 function refreshAllSealedDisplays() {
@@ -1098,7 +1317,6 @@ function refreshClariSealed() { refreshAllSealedDisplays(); }
 function renderHabits() {
   const list = document.getElementById('habitList');
   if (!list) return;
-  const now = Date.now();
 
   if (habits.length === 0) {
     list.innerHTML = '<div style="font-size:6px;color:#3A3560;text-align:center;letter-spacing:1px;line-height:2.5;">NO HAY HÁBITOS AÚN.<br>CREA UNO ARRIBA.</div>';
@@ -1107,27 +1325,15 @@ function renderHabits() {
 
   list.innerHTML = '';
   habits.forEach(h => {
-    const remaining = Math.max(0, h.deadlineAt - now);
-    const totalMs   = h.hours * 3600 * 1000;
     const manaRate  = habitManaRate(h.streak);
     const pending   = h.pendingMana || 0;
     const manaStars = '◆'.repeat(manaRate);
-    const sealDisabled = pending === 0 ? 'disabled' : '';
-
-    let countdownHtml = '';
-    if (h.hours > 0) {
-      const hrs     = Math.floor(remaining / 3600000);
-      const mins    = Math.floor((remaining % 3600000) / 60000);
-      const secs    = Math.floor((remaining % 60000) / 1000);
-      const timeStr = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-      countdownHtml = `<div class="habit-countdown">PRÓXIMO CICLO: ${timeStr}</div>`;
-    }
 
     const card = document.createElement('div');
     card.className = 'habit-card';
     card.innerHTML = `
       <div class="habit-top">
-        <div class="habit-name">${h.name}</div>
+        <div class="habit-name" style="cursor:pointer;" onclick="openHabitHistory(${h.id})">${h.name} <span style="font-size:5px;opacity:0.4;">▸ HISTORIAL</span></div>
         <div class="habit-actions">
           <button class="habit-action-btn edit" onclick="openEditHabitModal(${h.id})">✎</button>
           <button class="habit-action-btn del"  onclick="deleteHabit(${h.id})">✕</button>
@@ -1137,12 +1343,9 @@ function renderHabits() {
         <div class="habit-streak">RACHA: <span class="streak-val">${h.streak}</span></div>
         <div class="habit-mana-rate">${manaStars} ${manaRate} MANA</div>
       </div>
-      ${countdownHtml}
       <div class="habit-btn-row">
-        <button class="btn-complete" onclick="completeHabit(${h.id})">MARCAR COMPLETO</button>
-        <button class="btn-habit-seal" onclick="sealHabitManaById(${h.id},this)" ${sealDisabled}>
-          ${pending > 0 ? `SELLAR +${pending}` : 'SELLAR MANA'}
-        </button>
+        <button class="btn-complete" onclick="completeHabit(${h.id})">MARCAR COMPLETA</button>
+        <button class="btn-ignore"   onclick="ignoreHabit(${h.id})">IGNORAR</button>
       </div>
     `;
     list.appendChild(card);
@@ -1223,12 +1426,7 @@ function playCompleteSound() { try { const ctx=getAudio(); [[523,0.00,0.11],[659
 function playHabitCompleteSound() { try { const ctx=getAudio(); [[370,0.00,0.10],[466,0.13,0.10],[554,0.26,0.10],[740,0.40,0.28]].forEach(([f,t,d])=>playNote(ctx,f,t,d,0.22,'triangle')); } catch(e){} }
 function playHabitCreatedSound() { try { const ctx=getAudio(); [[330,0.00,0.08],[440,0.10,0.08]].forEach(([f,t,d])=>playNote(ctx,f,t,d,0.15,'triangle')); } catch(e){} }
 
-function closeIntroModal() {
-  playMysterySound();
-  const m = document.getElementById('introModal');
-  m.style.transition='opacity 0.6s ease'; m.style.opacity='0';
-  setTimeout(()=>{ m.style.display='none'; }, 620);
-}
+function closeIntroModal() { /* modal removed — kept for compatibility */ }
 
 // ═══════════════════════════════════════════════════════════
 //  TIMER
@@ -1553,6 +1751,19 @@ function playStarBornSound() {
   } catch(e) {}
 }
 
+// ── Star collision sound ──────────────────────────────────
+let _lastCollisionSound = 0;
+function playStarCollisionSound() {
+  const now = performance.now();
+  if (now - _lastCollisionSound < 100) return; // max ~10/s
+  _lastCollisionSound = now;
+  try {
+    const ctx = getAudio();
+    const freq = 520 + Math.random() * 360;
+    playNote(ctx, freq, 0, 0.07, 0.06, 'sine');
+  } catch(e) {}
+}
+
 // ── Star merge sound ──────────────────────────────────────
 function playStarMergeSound() {
   try {
@@ -1609,6 +1820,120 @@ function spawnStar() {
   return config;
 }
 
+// ── Star field physics (pinball) ──────────────────────────
+let starPhysics   = [];
+let physicsActive = false;
+let physicsRaf    = null;
+
+function onStarClick(el, cfg) {
+  const field = document.getElementById('starField');
+  if (!field) return;
+  const fw = field.offsetWidth, fh = field.offsetHeight;
+  const fieldRect = field.getBoundingClientRect();
+
+  if (!physicsActive) {
+    const allEls = Array.from(field.querySelectorAll('.jar-star'));
+    starPhysics = allEls.map((s, i) => {
+      const rect = s.getBoundingClientRect();
+      const cx = rect.left - fieldRect.left + rect.width  / 2;
+      const cy = rect.top  - fieldRect.top  + rect.height / 2;
+      const w  = parseFloat(s.getAttribute('width')) || 16;
+      const color = (jarStars[i] || {}).color || '#E8F8FF';
+      s.style.animation  = 'none';
+      s.style.transition = 'none';
+      s.style.transform  = 'none';
+      // Keep glow alive during physics
+      s.style.opacity = '0.95';
+      s.style.filter  = `drop-shadow(0 0 5px ${color}) drop-shadow(0 0 12px ${color})`;
+      const x = Math.max(w/2, Math.min(fw - w/2, cx));
+      const y = Math.max(w/2, Math.min(fh - w/2, cy));
+      s.style.left = (x - w/2) + 'px';
+      s.style.top  = (y - w/2) + 'px';
+      return { el: s, x, y, vx: 0, vy: 0, size: w, cfg: jarStars[i] || {}, color };
+    });
+    physicsActive = true;
+    physicsRaf = requestAnimationFrame(runStarPhysics);
+  }
+
+  // Give velocity to clicked star
+  const ps = starPhysics.find(s => s.el === el);
+  if (ps) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 6 + Math.random() * 5;
+    ps.vx = Math.cos(angle) * speed;
+    ps.vy = Math.sin(angle) * speed;
+  }
+}
+
+function runStarPhysics() {
+  if (!physicsActive) return;
+  const field = document.getElementById('starField');
+  if (!field) { physicsActive = false; return; }
+  const fw = field.offsetWidth, fh = field.offsetHeight;
+
+  // Move & wall bounce
+  starPhysics.forEach(s => {
+    s.x += s.vx; s.y += s.vy;
+    const r = s.size / 2;
+    if (s.x - r < 0)  { s.x = r;      s.vx =  Math.abs(s.vx) * 0.80; }
+    if (s.x + r > fw) { s.x = fw - r; s.vx = -Math.abs(s.vx) * 0.80; }
+    if (s.y - r < 0)  { s.y = r;      s.vy =  Math.abs(s.vy) * 0.80; }
+    if (s.y + r > fh) { s.y = fh - r; s.vy = -Math.abs(s.vy) * 0.80; }
+    s.el.style.left = (s.x - r) + 'px';
+    s.el.style.top  = (s.y - r) + 'px';
+  });
+
+  // Elastic star-star collisions
+  for (let i = 0; i < starPhysics.length; i++) {
+    for (let j = i + 1; j < starPhysics.length; j++) {
+      const a = starPhysics[i], b = starPhysics[j];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 0.01;
+      const minD = (a.size + b.size) * 0.5;
+      if (dist < minD) {
+        const nx = dx/dist, ny = dy/dist;
+        const rv = (a.vx - b.vx)*nx + (a.vy - b.vy)*ny;
+        if (rv > 0) {
+          const imp = rv * 0.90;
+          a.vx -= imp*nx; a.vy -= imp*ny;
+          b.vx += imp*nx; b.vy += imp*ny;
+          playStarCollisionSound();
+        }
+        const ov = (minD - dist) * 0.52;
+        a.x -= nx*ov; a.y -= ny*ov;
+        b.x += nx*ov; b.y += ny*ov;
+      }
+    }
+  }
+
+  // Friction + movement check
+  let anyMoving = false;
+  starPhysics.forEach(s => {
+    s.vx *= 0.985; s.vy *= 0.985;
+    if (Math.abs(s.vx) < 0.05) s.vx = 0;
+    if (Math.abs(s.vy) < 0.05) s.vy = 0;
+    if (s.vx !== 0 || s.vy !== 0) anyMoving = true;
+  });
+
+  if (anyMoving) {
+    physicsRaf = requestAnimationFrame(runStarPhysics);
+  } else {
+    physicsActive = false;
+    starPhysics.forEach(s => {
+      if (s.cfg && s.cfg.dur) {
+        // Stay at settled position — don't reset to original cx/cy
+        // Clear inline glow so jarTwinkle animation takes back over
+        s.el.style.filter  = '';
+        s.el.style.opacity = '';
+        s.el.style.animation = 'jarTwinkle ease-in-out infinite';
+        s.el.style.animationDuration = s.cfg.twDur;
+        s.el.style.animationDelay    = '0s';
+      }
+    });
+    starPhysics = []; physicsRaf = null;
+  }
+}
+
 function renderJarStar(cfg, container) {
   const field = container || document.getElementById('starField');
   if (!field) return;
@@ -1618,16 +1943,23 @@ function renderJarStar(cfg, container) {
   svg.setAttribute('viewBox',`0 0 ${cfg.size} ${cfg.size}`);
   svg.classList.add('jar-star');
   const s=cfg.size, h=s/2, t=s*0.19;
-  // 4-pointed star
   const path=`M${h},0 L${h+t},${h-t} L${s},${h} L${h+t},${h+t} L${h},${s} L${h-t},${h+t} L0,${h} L${h-t},${h-t} Z`;
   svg.innerHTML=`<path d="${path}" fill="${cfg.color}" opacity="0.95"/>`;
   svg.style.left=(cfg.cx-half)+'px'; svg.style.top=(cfg.cy-half)+'px';
+  svg.style.cursor        = 'pointer';
+  svg.style.pointerEvents = 'auto';
+  // Make inner path also clickable
+  svg.querySelector && setTimeout(() => {
+    const p = svg.querySelector('path');
+    if (p) { p.style.pointerEvents = 'auto'; p.style.cursor = 'pointer'; }
+  }, 0);
   svg.style.setProperty('--sc',cfg.color);
   svg.style.setProperty('--fx1',cfg.fx1); svg.style.setProperty('--fy1',cfg.fy1);
   svg.style.setProperty('--fx2',cfg.fx2); svg.style.setProperty('--fy2',cfg.fy2);
   svg.style.setProperty('--fx3',cfg.fx3); svg.style.setProperty('--fy3',cfg.fy3);
   svg.style.animationDuration=`${cfg.dur}, ${cfg.twDur}`;
   svg.style.animationDelay=`${cfg.delay}, ${cfg.delay}`;
+  svg.addEventListener('click', (e) => { e.stopPropagation(); onStarClick(svg, cfg); });
   field.appendChild(svg);
 }
 
@@ -1956,6 +2288,13 @@ window.addEventListener('load', () => {
   refreshTimer(); refreshProgress(); refreshMana(); renderHabits(); renderMissions();
   habitsTimerId=setInterval(tickHabits, 1000);
   setTimeout(renderAllJarStars, 80);
+  // Request notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+  // Play intro sound on first user interaction
+  const onFirstTouch = () => { playMysterySound(); document.removeEventListener('pointerdown', onFirstTouch); };
+  document.addEventListener('pointerdown', onFirstTouch);
 });
 window.addEventListener('resize', () => { SC.width=window.innerWidth; SC.height=window.innerHeight; initStars(); });
 </script>
